@@ -37,6 +37,58 @@ class LocationSearch(object):
         
         return matching_sites
     
+    def get_places_beginning_with(self,phrase):
+        """
+        Function to find locations that begin with the inputted string, for
+        example inputting 'exe' will return Exeter, Exe Estuary, and any others
+        that begin with 'exe'. All strings are converted to lowercase, so
+        capitalisation is not necessary.
+    
+        The output is a list of matching strings, sorted alphabetically. If
+        there are no matches then an empty list is outputted.
+        """
+    
+        matching_sites = []
+        
+        # Get all the sites
+        sites = self.conn.get_all_sites()
+    
+        # Search through the sites list
+        for site in sites:
+            if site.name.lower()[0:len(phrase)] == phrase.lower():
+                matching_sites.append(site.name)
+    
+        # Sort a-z
+        matching_sites.sort()
+        
+        return matching_sites
+    
+    def get_places_ending_with(self,phrase):
+        """
+        Function to find locations that end with the inputted string, for
+        example inputting 'tor' will return Haytor, Hameldown Tor and any others
+        ending with 'tor'. All strings are converted to lowercase, so
+        capitalisation is not necessary.
+    
+        The output is a list of matching strings, sorted alphabetically. If
+        there are no matches then an empty list is outputted.
+        """
+    
+        matching_sites = []
+        
+        # Get all the sites
+        sites = self.conn.get_all_sites()
+    
+        # Search through the sites list
+        for site in sites:
+            if site.name.lower()[-len(phrase):] == phrase.lower():
+                matching_sites.append(site.name)
+    
+        # Sort a-z
+        matching_sites.sort()
+        
+        return matching_sites
+    
     def get_sites_near(self,place_name, distance):
         """
         Function to find all places within a defined radius of the inputted
