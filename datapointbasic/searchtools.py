@@ -93,10 +93,28 @@ class LocationSearch(object):
         """
         Function to find all places within a defined radius of the inputted
         place. Input place_name should be a string which matches the name of a
-        site. Input distance should be a numerical distance in XXXX
+        site. Input distance should be a numerical distance in km
         The output is a list of strings of all matching sites. If no sites are
         within the radius then an empty array is outputted
         """
+        
         pass
+                
+                
+    def is_site(self,place_name):
+        """
+        Returns True if the inputted string is the name of a site. Otherwise
+        logical False is returned.The function is case insensetive.
+        """
+        
+        site_exists = False
+        sites = self.conn.get_all_sites()
+        
+        for site in sites:
+            if site.name.lower() == place_name.lower():
+                site_exists = True
+                break
+        
+        return site_exists
 
 
