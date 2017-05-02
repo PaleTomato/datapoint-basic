@@ -15,9 +15,9 @@ def placesearch(api_key=""):
     
     return search_obj
 
-def current_conditions(api_key=""):
+def currentconditions(api_key=""):
     """
-    Function current_conditions creates a new instance of the datapointbasic
+    Function currentconditions creates a new instance of the datapointbasic
     CurrentConditions class, and returns it. The methods of CurrentConditions
     can then be used to obtain the current weather conditions for a specific
     location
@@ -26,6 +26,7 @@ def current_conditions(api_key=""):
     The function returns a CurrentConditions object.
     """
     
-    search_obj = datapointbasic.searchtools.LocationSearch(api_key=api_key)
+    search_obj = datapointbasic.current_conditions.CurrentConditions(
+        api_key=api_key)
     
     return search_obj
