@@ -12,8 +12,9 @@ DataPoint service grows/evolves.__
 * Uses site names as inputs to most functions/methods
 
 ## Example Usage
-
-###Using the search functionality:
+Note that you will require a DataPoint API key in order to make use of this
+module
+### Using the search functionality:
 The following example uses the search functionality to find all sites beginning
 with "exe." The functionality, like all others in this module, is designed to
 be case-insensitive.
