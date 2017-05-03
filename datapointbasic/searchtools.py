@@ -1,4 +1,5 @@
 import datapoint
+from datapointbasic.tools import distance_between_points
 
 class LocationSearch(object):
     """
@@ -94,11 +95,41 @@ class LocationSearch(object):
         Function to find all places within a defined radius of the inputted
         place. Input place_name should be a string which matches the name of a
         site. Input distance should be a numerical distance in km
-        The output is a list of strings of all matching sites. If no sites are
-        within the radius then an empty array is outputted
+        The output is a list of strings of all matching sites.
+        
+        If no sites are within the radius then an empty array is outputted. If
+        the inputted site name is not found then -1 is returned
         """
         
-        pass
+        matching_sites = []
+        
+        # Get all the sites
+        sites = self.conn.get_all_sites()
+        
+        # Find our site in the list
+        for site in sites:
+            if site.name.lower() == place_name.lower():
+                this_site = site
+                this_lat  = float(this_site.latitude)
+                this_lon  = float(this_site.longitude)
+                break
+            
+        else:
+            return -1
+        
+        # Search through the sites list for any within range
+        for site in sites:
+            lat = float(site.latitude)
+            lon = float(site.longitude)
+            
+            this_dist = distance_between_points(this_lat, this_lon, lat, lon)
+            
+            if this_dist < distance:
+                matching_sites.append(site.name)
+                
+        matching_sites.sort()
+        
+        return matching_sites
                 
                 
     def is_site(self,place_name):

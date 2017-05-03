@@ -28,40 +28,42 @@ def get_place_id(connection,site_name):
     return False
 
 
-def lon_to_km(longitude,latitude):
+def distance_between_points(lat1,lon1,lat2,lon2):
     """
-    Function to calculate the distance in kilometres of the inputted longitude.
-    As longitude lines converge towards the poles, the distance of 1 degree of
-    longitude thus varies. Note that this function assumes that the Earth is
-    perfectly circular, which is not true in reality.
+    Function to find the distance in km between two points on the Earth, given
+    their latitudes and longitudes. The function utilises the Haversine forumula
+    to calculate the distance. This calculation assumes that the Earth is
+    perfectly spherical.
     
-    The inputs are the longitude (in degrees), which should be between -180 and
-    180, and the latitude of interest (also in degrees), which should be between
-    -90 at the South Pole, and +90 at the north pole.
+    The inputs are the latitude and longitude of the two locations, where
+    latitudes are between -90 and +90 degrees, and the longitudes are between
+    -180 and +180 degrees.
     
-    The function returns the distance in kilometres for the inputted degrees of
-    longitude.
-    """
-    
-    # Convert latitude to radians
-    latitude = math.radians(latitude)
-    
-    # Calculate a single degree of longitude
-    degree_lon = (math.pi*radius_earth_km*math.cos(latitude))/180
-    
-    return longitude * degree_lon
-
-
-def lat_to_km(latitude):
-    """
-    Function that returns the distance in kilometres for the inputted number of
-    degrees latitude. Note that this function assumes that the Earth is
-    perfectly spherical, which is not true in reality.
-    
-    The input is the latitude, in degrees. The functino returns the distance in
-    kilometres for the inputted degrees of latitude.
+    The output is the great-circle distance between the two locations.
     """
     
-    degree_lat = (math.pi * radius_earth_km)/180
+    # Convert to radians
+    lat1 = math.radians(lat1)
+    lat2 = math.radians(lat2)
+    lon1 = math.radians(lon1)
+    lon2 = math.radians(lon2)
     
-    return degree_lat * latitude
+    # Calculate the difference deltas of the latitudes and longitudes
+    delta_lat = abs(lat2 - lat1)
+    delta_lon = abs(lon2 - lon1)
+    
+    haversine = hav(delta_lat) + \
+                math.cos(lat1) * math.cos(lat2) * hav(delta_lon)
+    
+    haversine = 2 * math.asin( math.sqrt(haversine) )
+    
+    return radius_earth_km * haversine
+    
+    
+def hav(theta):
+    """
+    Function that returns the Haversine function of the inputted angle. The
+    input theta should be in radians
+    """
+    
+    return (math.sin(theta/2))**2
