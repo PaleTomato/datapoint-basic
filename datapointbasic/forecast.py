@@ -1,7 +1,7 @@
 import datapoint
 from datapointbasic.tools import get_place_id
 
-class CurrentConditions(object):
+class Forecast(object):
     
     def __init__(self,api_key):
         # Store API key and establish connection

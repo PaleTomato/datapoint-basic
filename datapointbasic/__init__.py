@@ -1,5 +1,5 @@
 import datapointbasic.searchtools
-import datapointbasic.current_conditions
+import datapointbasic.forecast
 
 def placesearch(api_key=""):
     """
@@ -26,7 +26,7 @@ def currentconditions(api_key=""):
     The function returns a CurrentConditions object.
     """
     
-    search_obj = datapointbasic.current_conditions.CurrentConditions(
+    search_obj = datapointbasic.forecast.Forecast(
         api_key=api_key)
     
     return search_obj
