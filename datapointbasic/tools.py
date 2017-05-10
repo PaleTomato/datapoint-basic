@@ -25,7 +25,8 @@ def get_place_id(connection,site_name):
         if site.name.lower() == site_name.lower():
             return site.id
 
-    return False
+    else:
+        raise ValueError("'%s' is not a real site!" % site_name)
 
 
 def distance_between_points(lat1,lon1,lat2,lon2):

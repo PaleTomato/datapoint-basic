@@ -2,165 +2,197 @@ import datapoint
 from datapointbasic.tools import get_place_id
 
 class Forecast(object):
+    """
+    Class that is used to return a forecast for a specific day
+    """
     
-    def __init__(self,api_key):
+    def __init__(self, api_key, day=0):
         # Store API key and establish connection
         self.api_key = api_key
         self.conn    = datapoint.connection(api_key=self.api_key)
+        self.day     = day
         
-    def get_current_conditions(self,place_name):
+        
+    def temperature(self,place_name):
+        """
+        Function to get the current temperature at the inputted location. The
+        input should be a string of the place name to search for.
+    
+        The outputs are a list of numerical temperature values for each
+        timestep, and the units as a string.
+        """
+        weathertype = 'temperature'
+        
+        values = self._get_values(place_name, weathertype)
+        units  = self._get_units(place_name, weathertype)
+
+        return (values, units)
+    
+        
+    def feelslike_temperature(self,place_name):
+        """
+        Function to get the current feels-like temperature at the inputted
+        location. The input should be a string of the place name to search for.
+    
+        The outputs are a list of numerical feels-like temperature values for
+        each timestep, and the units as a string.
+        """
+        weathertype = 'feels_like_temperature'
+        
+        values = self._get_values(place_name, weathertype)
+        units  = self._get_units(place_name, weathertype)
+
+        return (values, units)
+        
+    
+    def precipitation(self,place_name):
+        """
+        Function to get the current precipitation at the inputted location. The
+        input should be a string of the place name to search for.
+    
+        The outputs are a list of numerical precipitation values for each
+        timestep, and the units as a string.
+        """
+        weathertype = 'precipitation'
+        
+        values = self._get_values(place_name, weathertype)
+        units  = self._get_units(place_name, weathertype)
+
+        return (values, units)
+    
+    
+    def humidity(self,place_name):
+        """
+        Function to get the current humidity at the inputted location. The
+        input should be a string of the place name to search for.
+    
+        The outputs are a list of numerical humidity values for each timestep,
+        and the units as a string.
+        """
+        weathertype = 'humidity'
+        
+        values = self._get_values(place_name, weathertype)
+        units  = self._get_units(place_name, weathertype)
+
+        return (values, units)
+        
+        
+    def uv_index(self,place_name):
+        """
+        Function to get the current uv index at the inputted location. The
+        input should be a string of the place name to search for.
+    
+        The outputs are a list of numerical uv indices for each timestep, each
+        from 1 to 10.
+        """
+        weathertype = 'uv'
+        
+        values = self._get_values(place_name, weathertype)
+        
+        return values
+        
+    
+    def weather_type(self,place_name):
+        """
+        Function to get the current weather type at the inputted location. The
+        input should be a string of the place name to search for.
+    
+        The output is a list of string descriptions of the weather for each
+        timestep e.g. 'Heavy Rain'. The weather codes are also outputted as a
+        list of integers.
+        """
+        weathertype = 'weather'
+        
+        text   = self._get_text(place_name, weathertype)
+        values = self._get_values(place_name, weathertype)
+        
+        return (text, values)
+            
+    
+    def wind_speed(self,place_name):
+        """
+        Function to get the current wind speed at the inputted location. The
+        input should be a string of the place name to search for.
+    
+        The output is a list of numerical wind speeds for each timestep, and the
+        units as a string.
+        """
+        weathertype = 'wind_speed'
+        
+        values = self._get_values(place_name, weathertype)
+        units  = self._get_units(place_name, weathertype)
+        
+        return (values, units)
+        
+    
+    def wind_direction(self,place_name):
+        """
+        Function to get the current wind direction at the inputted location. The
+        input should be a string of the place name to search for.
+    
+        The output is a list of string compass directions for each timestep. The
+        string denotes the direction from which the wind is coming, e.g. 'NW'
+        for a wind from the north-west.
+        """
+        weathertype = 'wind_direction'
+        
+        values = self._get_values(place_name, weathertype)
+        
+        return values
+        
+    
+    def _get_text(self, place_name, weathertype):
+        """
+        Returns the text for the inputted place name and weather type as a
+        list of values for each timestep
+        """
+        day_forecast = self._get_forecast(place_name)
+        
+        values = []
+        
+        for timestep in day_forecast.timesteps:
+            values.append(timestep.__getattribute__(weathertype).text)
+        
+        return values
+    
+    def _get_units(self, place_name, weathertype):
+        """
+        Returns the units as a string for the inputted place name and weather
+        type
+        """
+        
+        day_forecast = self._get_forecast(place_name)
+        
+        return day_forecast.timesteps[0].__getattribute__(weathertype).units
+    
+    def _get_values(self, place_name, weathertype):
+        """
+        Returns the values for the inputted place name and weather type as a
+        list of values for each timestep
+        """
+        
+        day_forecast = self._get_forecast(place_name)
+        
+        values = []
+        
+        for timestep in day_forecast.timesteps:
+            values.append(timestep.__getattribute__(weathertype).value)
+        
+        return values
+        
+    def _get_forecast(self,place_name):
         """
         Function to get the current forecast at the inputted location. The input
         should be a string of the place name to search for.
     
-        The output is a datapoint timestep object. If the location is not found,
-        then False is outputted.
+        The output is a datapoint Day object.
         """
     
         # Get the place ID
         ID = get_place_id(self.conn,place_name)
     
-        if not ID:
-            return False
-    
         # Get the forecast for the site
         forecast = self.conn.get_forecast_for_site(ID, "3hourly")
     
-        return forecast.now()
-    
-        
-    def get_current_temperature(self,place_name):
-        """
-        Function to get the current temperature at the inputted location. The
-        input should be a string of the place name to search for.
-    
-        The outputs is a numerical temperature value and the units as a string.
-        If the location is not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return (now.temperature.value, now.temperature.units)
-        else:
-            return False
-    
-    def get_current_feelslike_temperature(self,place_name):
-        """
-        Function to get the current feels-like temperature at the inputted
-        location. The input should be a string of the place name to search for.
-    
-        The outputs is a numerical temperature value and the units as a string.
-        If the location is not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return (now.feels_like_temperature.value,
-                    now.feels_like_temperature.units)
-        else:
-            return False
-    
-    def get_current_precipitation(self,place_name):
-        """
-        Function to get the current precipitation at the inputted location. The
-        input should be a string of the place name to search for.
-    
-        The output is a numerical precipitation value  and the units as a
-        string. If the location is not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return (now.precipitation.value, now.precipitation.units)
-        else:
-            return False
-        
-    def get_current_humidity(self,place_name):
-        """
-        Function to get the current humidity at the inputted location. The
-        input should be a string of the place name to search for.
-    
-        The output is a numerical humidity value and the units as a string.
-        If the location is not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return (now.humidity.value, now.humidity.units)
-        else:
-            return False
-        
-    def get_current_uv_index(self,place_name):
-        """
-        Function to get the current uv index at the inputted location. The
-        input should be a string of the place name to search for.
-    
-        The output is a numerical uv index, from 1 to 10. If the location is
-        not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return now.uv.value
-        else:
-            return False
-        
-    
-    def get_current_weather(self,place_name):
-        """
-        Function to get the current weather type at the inputted location. The
-        input should be a string of the place name to search for.
-    
-        The output is a string description of the weather e.g. 'Heavy Rain'.
-        The weather code is also outputted as an integer. If the location is
-        not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return (now.weather.text,now.weather.value)
-        else:
-            return False
-        
-    
-    def get_current_windspeed(self,place_name):
-        """
-        Function to get the current wind speed at the inputted location. The
-        input should be a string of the place name to search for.
-    
-        The output is a numerical precipitation wind speed, and the units as a
-        string. If the location is not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return (now.wind_speed.value,now.wind_speed.units)
-        else:
-            return False
-        
-    
-    def get_current_winddirection(self,place_name):
-        """
-        Function to get the current wind direction at the inputted location. The
-        input should be a string of the place name to search for.
-    
-        The output is a string compass direction from which the wind is coming,
-        e.g. 'NW'. If the location is not found, then False is outputted.
-        """
-    
-        now = self.get_current_conditions(place_name)
-    
-        if now:
-            return now.wind_direction.value
-        else:
-            return False
-        
-    
+        return forecast.days[self.day]
         
