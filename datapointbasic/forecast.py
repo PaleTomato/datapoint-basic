@@ -12,6 +12,23 @@ class Forecast(object):
         self.conn    = datapoint.connection(api_key=self.api_key)
         self.day     = day
         
+    
+    def timesteps(self,place_name):
+        """
+        Function to return the date and time for each timestep in the forecast.
+        The input should be a string of the place name to search for.
+        
+        The output is a list of datetime objects, from which the dates and times
+        can be obtained
+        """
+        forecast = self._get_forecast(place_name)
+        
+        times = []
+        for timestep in forecast.timesteps:
+            times.append(timestep.date)
+        
+        return times
+        
         
     def temperature(self,place_name):
         """
