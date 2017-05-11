@@ -10,7 +10,7 @@ class LocationSearch(object):
         
         # Store API key and establish connection
         self.api_key = api_key
-        self.conn    = datapoint.connection(api_key=self.api_key)
+        self._conn    = datapoint.connection(api_key=self.api_key)
         
     def get_places_containing(self,phrase):
         """
@@ -26,7 +26,7 @@ class LocationSearch(object):
         matching_sites = []
         
         # Get all the sites
-        sites = self.conn.get_all_sites()
+        sites = self._conn.get_all_sites()
     
         # Search through the sites list
         for site in sites:
@@ -52,7 +52,7 @@ class LocationSearch(object):
         matching_sites = []
         
         # Get all the sites
-        sites = self.conn.get_all_sites()
+        sites = self._conn.get_all_sites()
     
         # Search through the sites list
         for site in sites:
@@ -78,7 +78,7 @@ class LocationSearch(object):
         matching_sites = []
         
         # Get all the sites
-        sites = self.conn.get_all_sites()
+        sites = self._conn.get_all_sites()
     
         # Search through the sites list
         for site in sites:
@@ -104,7 +104,7 @@ class LocationSearch(object):
         matching_sites = []
         
         # Get all the sites
-        sites = self.conn.get_all_sites()
+        sites = self._conn.get_all_sites()
         
         # Find our site in the list
         for site in sites:
@@ -139,7 +139,7 @@ class LocationSearch(object):
         """
         
         site_exists = False
-        sites = self.conn.get_all_sites()
+        sites = self._conn.get_all_sites()
         
         for site in sites:
             if site.name.lower() == place_name.lower():

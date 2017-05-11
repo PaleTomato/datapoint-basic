@@ -17,12 +17,15 @@ def placesearch(api_key=""):
 def locationforecast(place_name, api_key=""):
     """
     Function locationforecast creates a new instance of the datapointbasic
-    CurrentConditions class, and returns it. The methods of CurrentConditions
-    can then be used to obtain the current weather conditions for a specific
-    location
+    FullForecast class, and returns it. You can then obtain the conditions for
+    each day from the day attributes.
+    e.g.
+        forecast = locationforecast("Exeter", "aaaa-bbbb-cccc-dddd-eeee")
+        temperatures, units = forecast.day0.temperature()
     
-    The single input required is a valid API key for DataPoint.
-    The function returns a CurrentConditions object.
+    
+    The inputs required are a valid site name (as a string) and a valid API key
+    for DataPoint. The function returns a FullForecast object.
     """
     search_obj = datapointbasic.forecast.FullForecast(api_key, place_name)
     

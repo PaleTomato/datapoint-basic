@@ -214,12 +214,12 @@ class DayForecast(object):
     
         The output is a datapoint Day object.
         """
-    
+        conn = datapoint.connection(api_key=self.api_key)
+        
         # Get the place ID
-        ID = get_place_id(self.conn,self.place_name)
+        ID = get_place_id(conn, self.place_name)
     
         # Get the forecast for the site
-        conn     = datapoint.connection(api_key=self.api_key)
         forecast = conn.get_forecast_for_site(ID, "3hourly")
     
         return forecast.days[self.day]
