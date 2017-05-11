@@ -182,7 +182,7 @@ class DayForecast(object):
         values = []
         
         for timestep in self.forecast.timesteps:
-            values.append(timestep.__getattribute__(weathertype).text)
+            values.append( getattr(timestep, weathertype).text )
         
         return values
     
@@ -191,7 +191,7 @@ class DayForecast(object):
         """
         Returns the units as a string for the inputted weather type
         """
-        return self.forecast.timesteps[0].__getattribute__(weathertype).units
+        return getattr(self.forecast.timesteps[0], weathertype).units
     
     
     def _get_values(self, weathertype):
@@ -202,7 +202,7 @@ class DayForecast(object):
         values = []
         
         for timestep in self.forecast.timesteps:
-            values.append(timestep.__getattribute__(weathertype).value)
+            values.append( getattr(timestep, weathertype).value)
         
         return values
         
