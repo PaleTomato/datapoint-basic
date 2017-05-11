@@ -10,14 +10,13 @@ def placesearch(api_key=""):
     The single input required is a valid API key for DataPoint.
     The function returns a LocationSearch object.
     """
-    
     search_obj = datapointbasic.searchtools.LocationSearch(api_key=api_key)
     
     return search_obj
 
-def currentconditions(api_key=""):
+def locationforecast(place_name, api_key=""):
     """
-    Function currentconditions creates a new instance of the datapointbasic
+    Function locationforecast creates a new instance of the datapointbasic
     CurrentConditions class, and returns it. The methods of CurrentConditions
     can then be used to obtain the current weather conditions for a specific
     location
@@ -25,8 +24,6 @@ def currentconditions(api_key=""):
     The single input required is a valid API key for DataPoint.
     The function returns a CurrentConditions object.
     """
-    
-    search_obj = datapointbasic.forecast.Forecast(
-        api_key=api_key)
+    search_obj = datapointbasic.forecast.FullForecast(api_key, place_name)
     
     return search_obj

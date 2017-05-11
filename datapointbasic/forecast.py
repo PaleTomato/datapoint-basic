@@ -1,6 +1,28 @@
 import datapoint
 from datapointbasic.tools import get_place_id
 
+class FullForecast(object):
+    """
+    Class that utilises a number of DayForecast objects to return a full 5 day
+    forecast
+    """
+    
+    def __init__(self, api_key, place_name):
+        """
+        Initialises the class by creating a number of DayForecast objects for
+        days 0 to 4
+        """
+        self.place_name = place_name
+        self.api_key    = api_key
+        
+        # Get a forecast object for each day
+        self.day0 = DayForecast(self.api_key, self.place_name, 0)
+        self.day1 = DayForecast(self.api_key, self.place_name, 1)
+        self.day2 = DayForecast(self.api_key, self.place_name, 2)
+        self.day3 = DayForecast(self.api_key, self.place_name, 3)
+        self.day4 = DayForecast(self.api_key, self.place_name, 4)
+
+
 class DayForecast(object):
     """
     Class that is used to return a forecast for a specific day
@@ -12,10 +34,9 @@ class DayForecast(object):
         the specified day
         """
         self.api_key    = api_key
-        self.conn       = datapoint.connection(api_key=self.api_key)
         self.place_name = place_name
         self.day        = day
-        self.forecast   = self._get_forecast(self.place_name)
+        self.forecast   = self._get_forecast()
         
     
     def timesteps(self):
@@ -198,7 +219,8 @@ class DayForecast(object):
         ID = get_place_id(self.conn,self.place_name)
     
         # Get the forecast for the site
-        forecast = self.conn.get_forecast_for_site(ID, "3hourly")
+        conn     = datapoint.connection(api_key=self.api_key)
+        forecast = conn.get_forecast_for_site(ID, "3hourly")
     
         return forecast.days[self.day]
         
