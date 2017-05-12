@@ -37,3 +37,37 @@ Example Output:
 ```Python
 ['Exe Estuary', 'Exeter', 'Exeter Airport', ... , 'Exeter Youth Hostel']
 ```
+
+### Getting a forecast
+The following example shows how to get a 5 day forecast for a site, and print
+the temperatures and times of the first day (day 0). The sites are accessed by
+their name, so you can use the sites found with the search tools.
+
+```Python
+import datapointbasic
+api_key = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+place_name = "York"
+
+# Get the forecast for York
+forecast = datapointbasic.locationforecast(place_name, api_key)
+temps, units = forecast.day0.temperature()
+times = forecast.day0.timesteps()
+
+# Print the temperatures
+for i in range(len(temps)):
+    hours = times[i].time().isoformat(timespec="minutes")
+    print("%s - %s%s" % (hours, temps[i], units))
+
+```
+
+Example Output:
+```Python
+00:00 - 13C
+03:00 - 12C
+06:00 - 12C
+09:00 - 13C
+12:00 - 14C
+15:00 - 16C
+18:00 - 16C
+21:00 - 14C
+```
