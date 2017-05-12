@@ -61,7 +61,7 @@ for i in range(len(temps)):
 ```
 
 Example Output:
-```Python
+```
 00:00 - 13C
 03:00 - 12C
 06:00 - 12C
