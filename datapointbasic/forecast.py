@@ -14,14 +14,33 @@ class FullForecast(object):
         """
         self.place_name = place_name
         self.api_key    = api_key
+        forecast        = self._get_forecast()
         
         # Get a forecast object for each day
-        self.day0 = DayForecast(self.api_key, self.place_name, 0)
-        self.day1 = DayForecast(self.api_key, self.place_name, 1)
-        self.day2 = DayForecast(self.api_key, self.place_name, 2)
-        self.day3 = DayForecast(self.api_key, self.place_name, 3)
-        self.day4 = DayForecast(self.api_key, self.place_name, 4)
-        self.now  = CurrentConditions(self.api_key, self.place_name)
+        self.day0 = DayForecast(forecast.days[0])
+        self.day1 = DayForecast(forecast.days[1])
+        self.day2 = DayForecast(forecast.days[2])
+        self.day3 = DayForecast(forecast.days[3])
+        self.day4 = DayForecast(forecast.days[4])
+        self.now  = CurrentConditions(forecast.now())
+        
+        
+    def _get_forecast(self):
+        """
+        Function to get the current forecast for the site. The input should be
+        a string of the place name to search for.
+    
+        The output is a datapoint Day object.
+        """
+        conn = datapoint.connection(api_key=self.api_key)
+        
+        # Get the place ID
+        ID = get_place_id(conn, self.place_name)
+    
+        # Get the forecast for the site
+        forecast = conn.get_forecast_for_site(ID, "3hourly")
+    
+        return forecast
 
 
 class DayForecast(object):
@@ -29,15 +48,11 @@ class DayForecast(object):
     Class that is used to return a forecast for a specific day
     """
     
-    def __init__(self, api_key, place_name, day=0):
+    def __init__(self, forecast):
         """
-        Initially store the API key and other inputs, and get the forecast for
-        the specified day
+        Initially store the forecast for the specified day.
         """
-        self.api_key    = api_key
-        self.place_name = place_name
-        self._day       = day
-        self._forecast  = self._get_forecast()
+        self._forecast  = forecast
         
     
     def timesteps(self):
@@ -206,24 +221,6 @@ class DayForecast(object):
             values.append( getattr(timestep, weathertype).value)
         
         return values
-        
-        
-    def _get_forecast(self):
-        """
-        Function to get the current forecast for the site. The input should be
-        a string of the place name to search for.
-    
-        The output is a datapoint Day object.
-        """
-        conn = datapoint.connection(api_key=self.api_key)
-        
-        # Get the place ID
-        ID = get_place_id(conn, self.place_name)
-    
-        # Get the forecast for the site
-        forecast = conn.get_forecast_for_site(ID, "3hourly")
-    
-        return forecast.days[self._day]
     
     
 class CurrentConditions(DayForecast):
@@ -232,16 +229,6 @@ class CurrentConditions(DayForecast):
     day forecast
     """
     
-    def __init__(self, api_key, place_name):
-        """
-        Initially store the API key and other inputs, and get the forecast for
-        the current time
-        """
-        self.api_key    = api_key
-        self.place_name = place_name
-        self._forecast  = self._get_forecast()
-        
-        
     def timesteps(self):
         """
         Function to return the date and time for the current timestep, as a
@@ -270,21 +257,3 @@ class CurrentConditions(DayForecast):
         """
         return getattr(self._forecast, weathertype).value
         
-    
-    def _get_forecast(self):
-        """
-        Function to get the current forecast for the site. The input should be
-        a string of the place name to search for.
-    
-        The output is a datapoint Day object.
-        """
-        conn = datapoint.connection(api_key=self.api_key)
-        
-        # Get the place ID
-        ID = get_place_id(conn, self.place_name)
-    
-        # Get the forecast for the site
-        forecast = conn.get_forecast_for_site(ID, "3hourly")
-    
-        return forecast.now()
-    
