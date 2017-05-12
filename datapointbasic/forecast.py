@@ -21,6 +21,7 @@ class FullForecast(object):
         self.day2 = DayForecast(self.api_key, self.place_name, 2)
         self.day3 = DayForecast(self.api_key, self.place_name, 3)
         self.day4 = DayForecast(self.api_key, self.place_name, 4)
+        self.now  = CurrentConditions(self.api_key, self.place_name)
 
 
 class DayForecast(object):
@@ -35,8 +36,8 @@ class DayForecast(object):
         """
         self.api_key    = api_key
         self.place_name = place_name
-        self.day        = day
-        self.forecast   = self._get_forecast()
+        self._day       = day
+        self._forecast  = self._get_forecast()
         
     
     def timesteps(self):
@@ -47,7 +48,7 @@ class DayForecast(object):
         can be obtained
         """
         times = []
-        for timestep in self.forecast.timesteps:
+        for timestep in self._forecast.timesteps:
             times.append(timestep.date)
         
         return times
@@ -181,7 +182,7 @@ class DayForecast(object):
         """
         values = []
         
-        for timestep in self.forecast.timesteps:
+        for timestep in self._forecast.timesteps:
             values.append( getattr(timestep, weathertype).text )
         
         return values
@@ -191,7 +192,7 @@ class DayForecast(object):
         """
         Returns the units as a string for the inputted weather type
         """
-        return getattr(self.forecast.timesteps[0], weathertype).units
+        return getattr(self._forecast.timesteps[0], weathertype).units
     
     
     def _get_values(self, weathertype):
@@ -201,7 +202,7 @@ class DayForecast(object):
         """
         values = []
         
-        for timestep in self.forecast.timesteps:
+        for timestep in self._forecast.timesteps:
             values.append( getattr(timestep, weathertype).value)
         
         return values
@@ -222,5 +223,68 @@ class DayForecast(object):
         # Get the forecast for the site
         forecast = conn.get_forecast_for_site(ID, "3hourly")
     
-        return forecast.days[self.day]
+        return forecast.days[self._day]
+    
+    
+class CurrentConditions(DayForecast):
+    """
+    Class that returns just the current weather conditions, rather than the full
+    day forecast
+    """
+    
+    def __init__(self, api_key, place_name):
+        """
+        Initially store the API key and other inputs, and get the forecast for
+        the current time
+        """
+        self.api_key    = api_key
+        self.place_name = place_name
+        self._forecast  = self._get_forecast()
         
+        
+    def timesteps(self):
+        """
+        Function to return the date and time for the current timestep, as a
+        datetime object
+        """
+        return self._forecast.date
+    
+    
+    def _get_text(self, weathertype):
+        """
+        Returns the text for the inputted weather type as a string
+        """
+        return getattr(self._forecast, weathertype).text
+    
+    
+    def _get_units(self, weathertype):
+        """
+        Returns the units as a string for the inputted weather type
+        """
+        return getattr(self._forecast, weathertype).units
+    
+    
+    def _get_values(self, weathertype):
+        """
+        Returns the value for the inputted weather type
+        """
+        return getattr(self._forecast, weathertype).value
+        
+    
+    def _get_forecast(self):
+        """
+        Function to get the current forecast for the site. The input should be
+        a string of the place name to search for.
+    
+        The output is a datapoint Day object.
+        """
+        conn = datapoint.connection(api_key=self.api_key)
+        
+        # Get the place ID
+        ID = get_place_id(conn, self.place_name)
+    
+        # Get the forecast for the site
+        forecast = conn.get_forecast_for_site(ID, "3hourly")
+    
+        return forecast.now()
+    
