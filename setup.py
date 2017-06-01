@@ -9,6 +9,5 @@ setup(name='datapoint-basic',
       license='GPL-3.0',
       packages=['datapointbasic'],
       install_requires=[
-          'datapoint',
-          'math'
+          'datapoint'
       ])
