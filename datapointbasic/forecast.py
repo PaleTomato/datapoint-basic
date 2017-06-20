@@ -28,6 +28,14 @@ class FullForecast(object):
         self.units = ForecastUnits(forecast.now())
         
         
+    def change_location(self,new_location):
+        """
+        Changes the location used for the forecast to new_location, and gets a
+        forecast for the new location
+        """
+        self.__init__(self.api_key, new_location)
+        
+        
     def _get_forecast(self):
         """
         Function to get the current forecast for the site. The input should be
