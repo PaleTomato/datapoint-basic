@@ -9,8 +9,8 @@ class FullForecast(object):
     
     def __init__(self, api_key, place_name):
         """
-        Initialises the class by creating a number of DayForecast objects for
-        days 0 to 4
+        Initialises the class by creating the various forecast objects for
+        days 0 to 4, now and units
         """
         self.place_name = place_name
         self.api_key    = api_key
@@ -23,6 +23,9 @@ class FullForecast(object):
         self.day3 = DayForecast(forecast.days[3])
         self.day4 = DayForecast(forecast.days[4])
         self.now  = CurrentConditions(forecast.now())
+        
+        # Add the units
+        self.units = ForecastUnits(forecast.now())
         
         
     def _get_forecast(self):
@@ -43,105 +46,95 @@ class FullForecast(object):
         return forecast
 
 
-class DayForecast(object):
+class AbstractForecast(object):
+    """
+    Abstract class that is used to return forecast data
+    """
+    
+    def __init__(self, forecast):
+        """
+        Initially store the forecast for the specified day. You need to define
+        the _get_data method in any sub-classes
+        """
+        
+        self._forecast  = forecast
+        
+        self.temperature           = self._get_data("temperature")
+        self.feelslike_temperature = self._get_data("feels_like_temperature")
+        self.precipitation         = self._get_data("precipitation")
+        self.humidity              = self._get_data("humidity")
+        self.uv_index              = self._get_data("uv")
+        self.weather_type          = self._get_data("weather")
+        self.wind_speed            = self._get_data("wind_speed")
+        self.wind_direction        = self._get_data("wind_direction")
+        
+    
+class DayForecast(AbstractForecast):
     """
     Class that is used to return a forecast for a specific day
     """
     
     def __init__(self, forecast):
         """
-        Initially store the forecast for the specified day.
+        Initalise the object, and add the date/time
         """
-        self._forecast  = forecast
+        AbstractForecast.__init__(self, forecast)
         
-        self.temperature           = self._get_values("temperature")
-        self.feelslike_temperature = self._get_values("feels_like_temperature")
-        self.precipitation         = self._get_values("precipitation")
-        self.humidity              = self._get_values("humidity")
-        self.uv_index              = self._get_values("uv")
-        self.weather_type          = self._get_text("weather")
-        self.wind_speed            = self._get_values("wind_speed")
-        self.wind_direction        = self._get_values("wind_direction")
+        self.timesteps = [t.date for t in self._forecast.timesteps]
         
-    
-    def timesteps(self):
+        
+    def _get_data(self, weathertype):
         """
-        Function to return the date and time for each timestep in the forecast.
-        
-        The output is a list of datetime objects, from which the dates and times
-        can be obtained
+        Returns the text for the inputted weather type, or if this is not
+        available, returns the value instead
         """
-        times = []
-        for timestep in self._forecast.timesteps:
-            times.append(timestep.date)
+        tstep = self._forecast.timesteps
+        text  = [getattr(t, weathertype).text  for t in tstep]
+        value = [getattr(t, weathertype).value for t in tstep]
         
-        return times
+        if text[0] is None:
+            return value
+        else:
+            return text
         
         
-    def _get_text(self, weathertype):
-        """
-        Returns the text for the inputted weather type as a list of values for
-        each timestep
-        """
-        values = []
-        
-        for timestep in self._forecast.timesteps:
-            values.append( getattr(timestep, weathertype).text )
-        
-        return values
-    
-    
-    def _get_units(self, weathertype):
-        """
-        Returns the units as a string for the inputted weather type
-        """
-        return getattr(self._forecast.timesteps[0], weathertype).units
-    
-    
-    def _get_values(self, weathertype):
-        """
-        Returns the values for the inputted weather type as a list of values for
-        each timestep
-        """
-        values = []
-        
-        for timestep in self._forecast.timesteps:
-            values.append( getattr(timestep, weathertype).value)
-        
-        return values
-    
-    
-class CurrentConditions(DayForecast):
+class CurrentConditions(AbstractForecast):
     """
     Class that returns just the current weather conditions, rather than the full
     day forecast
     """
     
-    def timesteps(self):
+    def __init__(self, forecast):
         """
-        Function to return the date and time for the current timestep, as a
-        datetime object
+        Initalise the object, and add the date/time
         """
-        return self._forecast.date
+        AbstractForecast.__init__(self, forecast)
+        
+        self.timestep = self._forecast.date
     
     
-    def _get_text(self, weathertype):
+    def _get_data(self, weathertype):
         """
-        Returns the text for the inputted weather type as a string
+        Returns the text for the inputted weather type, or if this is not
+        available, returns the value instead
         """
-        return getattr(self._forecast, weathertype).text
+        text  = getattr(self._forecast, weathertype).text
+        value = getattr(self._forecast, weathertype).value
+        
+        if text is None:
+            return value
+        else:
+            return text
+        
     
+class ForecastUnits(AbstractForecast):
+    """
+    Class that is used to return the units for each forecast property
+    """
     
-    def _get_units(self, weathertype):
+    def _get_data(self, weathertype):
         """
-        Returns the units as a string for the inputted weather type
+        Returns the units for the inputted weather type
         """
         return getattr(self._forecast, weathertype).units
-    
-    
-    def _get_values(self, weathertype):
-        """
-        Returns the value for the inputted weather type
-        """
-        return getattr(self._forecast, weathertype).value
-        
+            
