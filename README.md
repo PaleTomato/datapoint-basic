@@ -50,8 +50,9 @@ place_name = "York"
 
 # Get the forecast for York
 forecast = datapointbasic.locationforecast(place_name, api_key)
-temps, units = forecast.day0.temperature()
-times = forecast.day0.timesteps()
+temps = forecast.day0.temperature
+units = forecast.units.temperature
+times = forecast.day0.timesteps
 
 # Print the temperatures
 for i in range(len(temps)):

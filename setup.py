@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='datapoint-basic',
-      version='0.2',
+      version='0.3',
       description='Simple access to Met Office\s datapoint API',
       url='https://github.com/PaleTomato/datapoint-basic',
       author='Patrick Leedham',
