@@ -8,6 +8,27 @@ import math
 # Define radius of the Earth
 radius_earth_km = 6371
 
+class ApiManager(object):
+    """
+    Class that manages the datapoint API key. All instances of the class share
+    the same state, so that the API key only needs to be entered once, and can
+    be then shared between all objects that use it
+    """
+    
+    _shared_state = {}
+    
+    def __init__(self, api_key=None):
+        """
+        Initalise by setting the __dict__ of the instance to the _shared_state
+        variable. This allows the api key to be shared between all instances of
+        this class.
+        """
+        self.__dict__ = ApiManager._shared_state
+        
+        if not api_key is None:
+            self.api_key = api_key
+
+
 def get_place_id(connection,site_name):
     """
     Function to find a place id from an inputted location. If the location is
