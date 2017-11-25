@@ -4,9 +4,11 @@ within the package_test
 """
 
 import math
+import requests
 
 # Define radius of the Earth
 radius_earth_km = 6371
+
 
 class ApiManager(object):
     """
@@ -28,6 +30,12 @@ class ApiManager(object):
         if not api_key is None:
             self.api_key = api_key
             
+            # Check that the API key is valid
+            if not self.api_key_is_valid():
+                raise ValueError(
+                    'Unable to return data from DataPoint.\n' + \
+                    'API key "%s" may be invalid.' % self.api_key)
+            
         # Raise an exception if the API key has not been entered the first time
         try:
             self.api_key
@@ -36,6 +44,22 @@ class ApiManager(object):
                 "API key must be set for the first instance of ApiManager"
                 )
             
+    
+    def api_key_is_valid(self):
+        """
+        Return True or False depending on whether the API key is valid.
+        """
+        
+        params = {'key':self.api_key,
+                  'res':'3hourly'}
+        
+        url = 'http://datapoint.metoffice.gov.uk/' + \
+            'public/data/val/wxfcs/all/json/capabilities'
+        
+        req = requests.get(url, params)
+        
+        return req.ok
+    
     
     def __repr__(self):
         
