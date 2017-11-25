@@ -27,6 +27,23 @@ class ApiManager(object):
         
         if not api_key is None:
             self.api_key = api_key
+            
+        # Raise an exception if the API key has not been entered the first time
+        try:
+            self.api_key
+        except AttributeError:
+            raise ValueError(
+                "API key must be set for the first instance of ApiManager"
+                )
+            
+    
+    def __repr__(self):
+        
+        return "ApiManager('%s')" % (self.api_key)
+    
+    def __str__(self):
+        
+        return self.api_key
 
 
 def get_place_id(connection,site_name):
