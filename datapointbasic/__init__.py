@@ -1,7 +1,8 @@
 import datapointbasic.searchtools
 import datapointbasic.forecast
+from datapointbasic.tools import ApiManager
 
-def placesearch(api_key=""):
+def placesearch(api_key=None):
     """
     Function placesearch creates a new instance of the datapointbasic
     LocationSearch class, and returns it. The methods of the LocationSearch can
@@ -10,11 +11,13 @@ def placesearch(api_key=""):
     The single input required is a valid API key for DataPoint.
     The function returns a LocationSearch object.
     """
-    search_obj = datapointbasic.searchtools.LocationSearch(api_key=api_key)
+    
+    api = ApiManager(api_key)
+    search_obj = datapointbasic.searchtools.LocationSearch(api.api_key)
     
     return search_obj
 
-def locationforecast(place_name, api_key=""):
+def locationforecast(place_name, api_key=None):
     """
     Function locationforecast creates a new instance of the datapointbasic
     FullForecast class, and returns it. You can then obtain the conditions for
@@ -27,6 +30,8 @@ def locationforecast(place_name, api_key=""):
     The inputs required are a valid site name (as a string) and a valid API key
     for DataPoint. The function returns a FullForecast object.
     """
-    search_obj = datapointbasic.forecast.FullForecast(api_key, place_name)
+    
+    api = ApiManager(api_key)
+    search_obj = datapointbasic.forecast.FullForecast(api, place_name)
     
     return search_obj
