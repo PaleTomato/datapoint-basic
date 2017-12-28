@@ -2,18 +2,29 @@ from datapointbasic.request import SiteSpecificRequest, RegionalRequest
 
 class Forecast3hourly(SiteSpecificRequest):
     
-    def __init__(self):
-        SiteSpecificRequest.__init__(self)
-
+    def __init__(self, site_id):
+        SiteSpecificRequest.__init__(self, site_id)
+        
+        self.params['res'] = '3hourly'
+        self.wx = 'wxfcs'
+        
+        
 class ForecastDaily(SiteSpecificRequest):
     
-    pass
-
-
+    def __init__(self, site_id):
+        SiteSpecificRequest.__init__(self, site_id)
+        
+        self.params['res'] = 'daily'
+        self.wx = 'wxfcs'
+    
+    
 class ObservationsHourly(SiteSpecificRequest):
     
-    pass
-
+    def __init__(self, site_id):
+        SiteSpecificRequest.__init__(self, site_id)
+        
+        self.params['res'] = 'hourly'
+        self.wx = 'wxobs'
 
 class RegionalForecast(RegionalRequest):
     
