@@ -42,3 +42,23 @@ visibility = {
     'GO':'Good - Between 10-20 km',
     'VG':'Very good - Between 20-40 km',
     'EX':'Excellent - More than 40 km'}
+
+
+region_names = {
+    'os':'Orkney and Shetland',
+    'he':'Highland and Eilean Siar',
+    'gr':'Grampian',
+    'ta':'Tayside',
+    'st':'Strathclyde',
+    'dg':'Dumfries, Galloway, Lothian',
+    'ni':'Northern Ireland',
+    'yh':'Yorkshire and the Humber',
+    'ne':'Northeast England',
+    'em':'East Midlands',
+    'ee':'East of England',
+    'se':'London and Southeast England',
+    'nw':'Northwest England',
+    'wm':'West Midlands',
+    'sw':'Southwest England',
+    'wl':'Wales',
+    'uk':'United Kingdom'}
