@@ -3,6 +3,7 @@ Python module containing abstract classes to retrieve data from DataPoint
 """
 
 import requests
+import datetime
 from datapointbasic.tools import ApiManager
 
 BASE_URL = 'http://datapoint.metoffice.gov.uk/public/data'
@@ -63,6 +64,16 @@ class SiteSpecificRequest(GenericRequest):
     def feed(self):
         
         return self.site_id
+    
+    
+    def _get_days(self):
+        
+        raw_data = self.retrieve_data()
+        
+        params = raw_data['SiteRep']['Wx']['Param']
+        days   = raw_data['SiteRep']['DV']['Location']['Period']
+        
+        self.days = [Day(params, day) for day in days]
         
 class RegionalRequest(GenericRequest):
     """
@@ -99,3 +110,66 @@ class SitelistRequest(GenericRequest):
         
         self.site_data = req['Locations']['Location']
             
+
+class Day(object):
+    """
+    Class to store a day of weather.
+    """
+    
+    def __init__(self, params, day):
+        
+        self._set_params(params, day)
+                
+    def _set_params(self, params, day):
+        """
+        Assign the inputted data for the day to the object.
+        """
+        
+        timesteps = day['Rep']
+        
+        # Assign the day and get times of each timestep
+        date = day['value']
+        year  = int(date[:4])
+        month = int(date[5:7])
+        day   = int(date[8:10])
+        hours = [int(timestep['$']) // 60 for timestep in timesteps]
+        mins  = [int(timestep['$']) % 60 for timestep in timesteps]
+        
+        self.date = datetime.date(year, month, day)
+        times     = [datetime.datetime(year, month, day, hour, minute) 
+                     for hour, minute in zip(hours, mins)]
+        
+        # Assign the remaining parameters
+        self.params = {}
+        
+        for param in params:
+            
+            shortname = param['name']
+            units     = param['units']
+            longname  = param['$']
+            
+            values = [timestep[shortname] for timestep in timesteps]
+            
+            self.params[longname] = WeatherField(
+                longname, units, values, times)
+            
+    
+    def __repr__(self):
+        return "{}('{}')".format(type(self).__name__, str(self.date))
+                     
+
+class WeatherField(object):
+    """
+    Class to store a data field returned from DataPoint
+    """
+    
+    def __init__(self, name, units, values, times):
+        
+        self.name   = name
+        self.units  = units
+        self.values = values
+        self.times  = times
+        
+        
+    def __repr__(self):
+        return "{}('{}')".format(type(self).__name__, self.name)

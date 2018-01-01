@@ -1,5 +1,6 @@
 from datapointbasic.request import SitelistRequest
 from datapointbasic.forecasts import Forecast3hourly, ForecastDaily, ObservationsHourly
+from datapointbasic.codes import region_names
 
 class SiteList(object):
     """
@@ -66,7 +67,12 @@ class SiteList(object):
             self._sites[site_id].observations = ObservationsHourly(site_id)
             
         
-
+class RegionList(object):
+    
+    def __init__(self):
+        pass
+    
+    
 class Site(object):
     
     def __init__(
@@ -86,4 +92,11 @@ class Site(object):
     
     def __str__(self):
         return self.name
+    
+    
+    
+class Region(object):
+    
+    def __init__(self):
+        pass
     
