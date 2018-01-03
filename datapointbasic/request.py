@@ -57,6 +57,8 @@ class SiteSpecificRequest(GenericRequest):
         self.item    = 'all'
         self.site_id = site_id
         
+        self._retreived_data = False
+        
     def __repr__(self):
         return "{}('{}')".format(type(self).__name__, self.site_id)
     
@@ -65,6 +67,15 @@ class SiteSpecificRequest(GenericRequest):
         
         return self.site_id
     
+    @property
+    def days(self):
+        
+        if not self._retreived_data:
+            self._get_days()
+            self._retreived_data = True
+        
+        return self._days
+        
     
     def _get_days(self):
         
@@ -73,7 +84,7 @@ class SiteSpecificRequest(GenericRequest):
         params = raw_data['SiteRep']['Wx']['Param']
         days   = raw_data['SiteRep']['DV']['Location']['Period']
         
-        self.days = [Day(params, day) for day in days]
+        self._days = [Day(params, day) for day in days]
         
 class RegionalRequest(GenericRequest):
     """
@@ -148,10 +159,13 @@ class Day(object):
             units     = param['units']
             longname  = param['$']
             
-            values = [timestep[shortname] for timestep in timesteps]
             
-            self.params[longname] = WeatherField(
-                longname, units, values, times)
+            values = [timestep[shortname] if shortname in timestep else None for timestep in timesteps]
+            
+            self.__setattr__(
+                longname.replace(' ','_'),
+                WeatherField(longname, units, values, times)
+                )
             
     
     def __repr__(self):
