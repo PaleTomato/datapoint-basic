@@ -19,6 +19,7 @@ class SiteList(object):
         
         if not self._retrieved_sites:
             self._create_site_list()
+            self._retrieved_sites = True
             
         return self._sites
     
@@ -65,7 +66,7 @@ class SiteList(object):
                                             longitude, elevation)
                 
             self._sites[site_id].observations = ObservationsHourly(site_id)
-            
+        
         
 class RegionList(object):
     
