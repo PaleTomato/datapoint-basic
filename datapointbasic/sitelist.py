@@ -25,47 +25,7 @@ class SiteList(object):
     
     
     def _create_site_list(self):
-        """
-        Create and store the site list from DataPoint.
-        
-        Retrieves the site lists for forecast and observations from DataPoint
-        and stores those within self._sites
-        """
-        sitelist_forecast     = SitelistRequest('val', 'wxfcs', 'all')
-        sitelist_observations = SitelistRequest('val', 'wxobs', 'all')
-        
-        self._sites = {}
-        for location in sitelist_forecast.site_data:
-            
-            name      = location['name']
-            site_id   = int(location['id'])
-            region    = location['region']    if 'region'    in location else None
-            latitude  = location['latitude']  if 'latitude'  in location else None
-            longitude = location['longitude'] if 'longitude' in location else None
-            elevation = location['elevation'] if 'elevation' in location else None
-            
-            self._sites[site_id] = Site(name, site_id, region, latitude,
-                                        longitude, elevation)
-            
-            self._sites[site_id].forecast3hourly = Forecast3hourly(site_id)
-            self._sites[site_id].forecastdaily   = ForecastDaily(site_id)
-            
-            
-        for location in sitelist_observations.site_data:
-            site_id = int(location['id'])
-            
-            if not site_id in self._sites.keys():
-                name      = location['name']
-                site_id   = int(location['id'])
-                region    = location['region']    if 'region'    in location else None
-                latitude  = location['latitude']  if 'latitude'  in location else None
-                longitude = location['longitude'] if 'longitude' in location else None
-                elevation = location['elevation'] if 'elevation' in location else None
-                
-                self._sites[site_id] = Site(name, site_id, region, latitude,
-                                            longitude, elevation)
-                
-            self._sites[site_id].observations = ObservationsHourly(site_id)
+        self._sites = get_list_of_sites()
         
         
 class RegionList(object):
@@ -100,4 +60,51 @@ class Region(object):
     
     def __init__(self):
         pass
+    
+    
+
+def get_list_of_sites():
+    """
+    Create and store the site list from DataPoint.
+    
+    Retrieves the site lists for forecast and observations from DataPoint and
+    stores those within self._sites
+    """
+    sitelist_forecast     = SitelistRequest('val', 'wxfcs', 'all')
+    sitelist_observations = SitelistRequest('val', 'wxobs', 'all')
+    
+    sites = {}
+    for location in sitelist_forecast.site_data:
+        
+        name      = location['name']
+        site_id   = int(location['id'])
+        region    = location['region']    if 'region'    in location else None
+        latitude  = location['latitude']  if 'latitude'  in location else None
+        longitude = location['longitude'] if 'longitude' in location else None
+        elevation = location['elevation'] if 'elevation' in location else None
+        
+        sites[site_id] = Site(name, site_id, region, latitude,
+                                    longitude, elevation)
+        
+        sites[site_id].forecast3hourly = Forecast3hourly(site_id)
+        sites[site_id].forecastdaily   = ForecastDaily(site_id)
+        
+        
+    for location in sitelist_observations.site_data:
+        site_id = int(location['id'])
+        
+        if not site_id in sites.keys():
+            name      = location['name']
+            site_id   = int(location['id'])
+            region    = location['region']    if 'region'    in location else None
+            latitude  = location['latitude']  if 'latitude'  in location else None
+            longitude = location['longitude'] if 'longitude' in location else None
+            elevation = location['elevation'] if 'elevation' in location else None
+            
+            sites[site_id] = Site(name, site_id, region, latitude,
+                                        longitude, elevation)
+            
+        sites[site_id].observations = ObservationsHourly(site_id)
+        
+    return sites
     
