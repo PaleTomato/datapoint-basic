@@ -1,4 +1,4 @@
-from datapointbasic.request import SiteSpecificRequest, RegionalRequest
+from .request import SiteSpecificRequest, RegionalRequest
 
 class Forecast3hourly(SiteSpecificRequest):
     

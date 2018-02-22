@@ -4,7 +4,7 @@ Python module containing abstract classes to retrieve data from DataPoint
 
 import requests
 import datetime
-from datapointbasic.tools import ApiManager
+from ..tools import ApiManager
 
 BASE_URL = 'http://datapoint.metoffice.gov.uk/public/data'
 

@@ -1,6 +1,6 @@
-from datapointbasic.request import SitelistRequest
-from datapointbasic.forecasts import Forecast3hourly, ForecastDaily, ObservationsHourly
-from datapointbasic.codes import region_names
+from .api_requests.request import SitelistRequest
+from .api_requests.forecasts import Forecast3hourly, ForecastDaily, ObservationsHourly
+from .api_requests.codes import region_names
 
 class SiteList(object):
     """

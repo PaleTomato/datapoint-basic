@@ -1,2 +1,2 @@
-from datapointbasic.tools import ApiManager
-from datapointbasic.sitelist import SiteList
+from .tools import ApiManager
+from .sitelist import SiteList
