@@ -8,7 +8,6 @@ class LocationComponent(object):
     """
     def __init__(self, name):
         self.name = name
-        self.children = []
     
     def add(self):
         pass
@@ -21,6 +20,9 @@ class LocationComponent(object):
     
     def __len__(self):
         return len(self.children)
+    
+    def __iter__(self):
+        return NullIterator()
     
     
 class Site(LocationComponent):
@@ -41,6 +43,7 @@ class Area(LocationComponent):
     
     def __init__(self, name):
         LocationComponent.__init__(self, name)
+        self.children = []
         
     def add(self, component):
         self.children.append(component)
@@ -75,10 +78,22 @@ class AreaIterator(object):
     def __init__(self, children):
         self.position = 0
         self.children = children
+        self.stack = [children.__iter__()]
         
     def __next__(self):
-        if self.position < len(self.children):
-            self.position += 1
-            return self.children[self.position-1]
+        
+        if self.stack == []:
+            raise StopIteration
         else:
-            raise StopIteration()
+            try:
+                component = next(self.stack[-1])
+                self.stack.append(component.__iter__())
+                return component
+            except StopIteration:
+                self.stack.pop()
+                return self.__next__()
+        
+        
+class NullIterator(object):
+    def __next__(self):
+        raise StopIteration()
