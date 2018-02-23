@@ -18,11 +18,14 @@ class LocationComponent(object):
     def __getitem__(self):
         pass
     
-    def __len__(self):
-        return len(self.children)
-    
     def __iter__(self):
         return NullIterator()
+    
+    def __repr__(self):
+        return "{}('{}')".format(type(self).__name__, self.name)
+    
+    def __str__(self):
+        return self.name
     
     
 class Site(LocationComponent):
@@ -38,6 +41,9 @@ class Site(LocationComponent):
         self.forecast_daily   = forecast_daily
         self.observations     = observations
         
+    def __repr__(self):
+        return "{}('{}:{}')".format(type(self).__name__, self.name, self.id)
+        
 
 class Area(LocationComponent):
     
@@ -51,11 +57,13 @@ class Area(LocationComponent):
     def remove(self, idx):
         self.children[idx] = []
         
+    def __len__(self):
+        return len(self.children)
+    
     def __getitem__(self, idx):
         return self.children[idx]
     
     def __iter__(self):
-        # return self.children.__iter__()
         return AreaIterator(self.children)
         
         
@@ -68,6 +76,9 @@ class Region(Area):
         self.id = region_id
         self.regional_forecast = regional_forecast
         self.regional_extremes = regional_extremes
+        
+    def __repr__(self):
+        return "{}('{}:{}')".format(type(self).__name__, self.name, self.id)
         
         
 class AreaIterator(object):
