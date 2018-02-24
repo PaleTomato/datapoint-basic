@@ -1,6 +1,9 @@
 """
 Classes to define all location types. Uses the Composite Pattern.
 """
+from .api_requests.forecasts import Forecast3hourly, ForecastDaily, \
+    ObservationsHourly
+
 
 class LocationComponent(object):
     """
@@ -27,31 +30,50 @@ class LocationComponent(object):
     def __str__(self):
         return self.name
     
+    def __eq__(self, value):
+        return self.name == value
+    
     
 class Site(LocationComponent):
     
-    def __init__(self, name, site_id, latitude=None, longitude=None, 
-                 forecast_3hourly=None, forecast_daily=None, observations=None):
+    def __init__(self, name, site_id, latitude=None, longitude=None,
+                 elevation = None):
         
         LocationComponent.__init__(self, name)
         self.id               = site_id
         self.latitude         = latitude
         self.longitude        = longitude
-        self.forecast_3hourly = forecast_3hourly
-        self.forecast_daily   = forecast_daily
-        self.observations     = observations
+        self.elevation        = elevation
         
     def __repr__(self):
         return "{}('{}:{}')".format(type(self).__name__, self.name, self.id)
-        
+    
+    def add_forecast(self):
+        """
+        Adds the 3-hourly and daily forecast objects to the site
+        """
+        self.forecast_3hourly = Forecast3hourly(self.id)
+        self.forecast_daily   = ForecastDaily(self.id)
+    
+    def add_observations(self):
+        """
+        Adds observations object to the site
+        """
+        self.observations = ObservationsHourly(self.id)
 
 class Area(LocationComponent):
     
     def __init__(self, name):
         LocationComponent.__init__(self, name)
         self.children = []
+        self.regions  = []
+        self.areas    = []
         
     def add(self, component):
+        if type(component) == Region:
+            self.regions.append(component)
+        if type(component) == Area:
+            self.areas.append(component)
         self.children.append(component)
         
     def remove(self, idx):
