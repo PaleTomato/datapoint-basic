@@ -37,29 +37,25 @@ class LocationComponent(object):
 class Site(LocationComponent):
     
     def __init__(self, name, site_id, latitude=None, longitude=None,
-                 elevation = None):
+                 elevation = None, has_forecast=False, has_obs=False):
         
         LocationComponent.__init__(self, name)
-        self.id               = site_id
-        self.latitude         = latitude
-        self.longitude        = longitude
-        self.elevation        = elevation
+        self.id        = site_id
+        self.latitude  = latitude
+        self.longitude = longitude
+        self.elevation = elevation
+        
+        if has_forecast:
+            self.forecast_3hourly = Forecast3hourly(self.id)
+            self.forecast_daily   = ForecastDaily(self.id)
+            
+        if has_obs:
+            self.observations = ObservationsHourly(self.id)
         
     def __repr__(self):
         return "{}('{}:{}')".format(type(self).__name__, self.name, self.id)
     
-    def add_forecast(self):
-        """
-        Adds the 3-hourly and daily forecast objects to the site
-        """
-        self.forecast_3hourly = Forecast3hourly(self.id)
-        self.forecast_daily   = ForecastDaily(self.id)
     
-    def add_observations(self):
-        """
-        Adds observations object to the site
-        """
-        self.observations = ObservationsHourly(self.id)
 
 class Area(LocationComponent):
     
