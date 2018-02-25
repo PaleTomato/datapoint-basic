@@ -2,7 +2,7 @@
 Classes to define all location types. Uses the Composite Pattern.
 """
 from .api_requests.forecasts import Forecast3hourly, ForecastDaily, \
-    ObservationsHourly
+    ObservationsHourly, RegionalForecast
 
 
 class LocationComponent(object):
@@ -87,13 +87,11 @@ class Area(LocationComponent):
         
 class Region(Area):
     
-    def __init__(self, name, region_id, regional_forecast=None, 
-                 regional_extremes=None):
+    def __init__(self, name, region_id):
         
         Area.__init__(self, name)
         self.id = region_id
-        self.regional_forecast = regional_forecast
-        self.regional_extremes = regional_extremes
+        self.regional_forecast = RegionalForecast(self.id)
         
     def __repr__(self):
         return "{}('{}:{}')".format(type(self).__name__, self.name, self.id)
