@@ -1,5 +1,5 @@
 from .api_requests.codes import region_names
-from .api_requests.request import SitelistRequest
+from .api_requests.generic import SitelistRequest
 from .locations import Region, Site
 
 

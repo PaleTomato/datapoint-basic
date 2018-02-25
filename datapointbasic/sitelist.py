@@ -1,5 +1,5 @@
-from .api_requests.request import SitelistRequest
-from .api_requests.forecasts import Forecast3hourly, ForecastDaily, ObservationsHourly
+from .api_requests.generic import SitelistRequest
+from .api_requests.site_specific import Forecast3hourly, ForecastDaily, ObservationsHourly
 from .api_requests.codes import region_names
 
 class SiteList(object):

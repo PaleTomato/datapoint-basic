@@ -1,30 +1,16 @@
-from .request import SiteSpecificRequest, RegionalRequest
+from .generic import GenericRequest
 
-class Forecast3hourly(SiteSpecificRequest):
+class RegionalRequest(GenericRequest):
+    """
+    Regional request
+    """
     
-    def __init__(self, site_id):
-        SiteSpecificRequest.__init__(self, site_id)
+    def __init__(self):
         
-        self.params['res'] = '3hourly'
-        self.wx = 'wxfcs'
+        GenericRequest.__init__(self)
         
-        
-class ForecastDaily(SiteSpecificRequest):
+        self.val = 'txt'
     
-    def __init__(self, site_id):
-        SiteSpecificRequest.__init__(self, site_id)
-        
-        self.params['res'] = 'daily'
-        self.wx = 'wxfcs'
-    
-    
-class ObservationsHourly(SiteSpecificRequest):
-    
-    def __init__(self, site_id):
-        SiteSpecificRequest.__init__(self, site_id)
-        
-        self.params['res'] = 'hourly'
-        self.wx = 'wxobs'
 
 class RegionalForecast(RegionalRequest):
     

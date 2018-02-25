@@ -1,9 +1,9 @@
 """
 Classes to define all location types. Uses the Composite Pattern.
 """
-from .api_requests.forecasts import Forecast3hourly, ForecastDaily, \
-    ObservationsHourly, RegionalForecast
-
+from .api_requests.site_specific import Forecast3hourly, ForecastDaily, \
+    ObservationsHourly
+from .api_requests.regional import RegionalForecast
 
 class LocationComponent(object):
     """

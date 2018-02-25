@@ -1,49 +1,6 @@
-"""
-Python module containing abstract classes to retrieve data from DataPoint
-"""
-
-import requests
 import datetime
-from ..tools import ApiManager
+from .generic import GenericRequest
 
-BASE_URL = 'http://datapoint.metoffice.gov.uk/public/data'
-
-
-class GenericRequest(object):
-    """
-    Generic request to DataPoint
-    """
-    
-    def __init__(self):
-        """
-        Initialise the object
-        """
-        
-        self.api_key  = ApiManager()
-        self.url      = BASE_URL
-        self.datatype = 'json'
-        self.params   = {'key': self.api_key.api_key}
-        
-        
-    def retrieve_data(self):
-        """
-        Forms the request together and returns the json
-        """
-        
-        url = '{}/{}/{}/{}/{}/{}'.format(
-            BASE_URL,
-            self.val,
-            self.wx,
-            self.item,
-            self.datatype,
-            self.feed
-            )
-        
-        req = requests.get(url, self.params)
-        
-        return req.json()
-        
-        
 class SiteSpecificRequest(GenericRequest):
     """
     Site-specific request
@@ -86,41 +43,33 @@ class SiteSpecificRequest(GenericRequest):
         
         self._days = [Day(params, day) for day in days]
         
-class RegionalRequest(GenericRequest):
-    """
-    Regional request
-    """
-    
-    def __init__(self):
-        
-        GenericRequest.__init__(self)
-        
-        self.val = 'txt'
-    
 
-class SitelistRequest(GenericRequest):
-    """
-    Class that returns the valid sites for the forecast in question
-    """
+class Forecast3hourly(SiteSpecificRequest):
     
-    def __init__(self, val, wx, item):
+    def __init__(self, site_id):
+        SiteSpecificRequest.__init__(self, site_id)
         
-        GenericRequest.__init__(self)
-        
-        self.val  = val
-        self.wx   = wx
-        self.item = item
-        self.feed = 'sitelist'
-        
-        self.get_all_sites()
-        
-    def get_all_sites(self):
+        self.params['res'] = '3hourly'
+        self.wx = 'wxfcs'
         
         
-        req = self.retrieve_data()
+class ForecastDaily(SiteSpecificRequest):
+    
+    def __init__(self, site_id):
+        SiteSpecificRequest.__init__(self, site_id)
         
-        self.site_data = req['Locations']['Location']
-            
+        self.params['res'] = 'daily'
+        self.wx = 'wxfcs'
+    
+    
+class ObservationsHourly(SiteSpecificRequest):
+    
+    def __init__(self, site_id):
+        SiteSpecificRequest.__init__(self, site_id)
+        
+        self.params['res'] = 'hourly'
+        self.wx = 'wxobs'
+
 
 class Day(object):
     """
