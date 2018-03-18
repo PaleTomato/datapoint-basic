@@ -136,3 +136,61 @@ class WeatherField(object):
         
     def __repr__(self):
         return "{}('{}')".format(type(self).__name__, self.name)
+    
+    
+def get_values(raw_data):
+    
+    params    = raw_data['SiteRep']['Wx']['Param']
+    data_days = raw_data['SiteRep']['DV']['Location']['Period']
+    
+    param_values = {}
+    timesteps = []
+    param_names = {}
+    
+    for param in params:
+        shortname = param['name']
+        units     = param['units']
+        longname  = param['$']
+        
+        param_names[longname]   = shortname
+        param_values[shortname] = []
+    
+    
+    for data_day in data_days:
+        
+        # Get the date
+        date = data_day['value']
+        year  = int(date[:4])
+        month = int(date[5:7])
+        day   = int(date[8:10])
+        
+        # Go through each timestep for this date
+        for timestep in data_day['Rep']:
+            
+            for param in param_values.keys():
+                if param in timestep.keys():
+                    param_values[param].append(timestep[param])
+                
+                else:
+                    param_values[param].append(None)
+            
+            if timestep['$'] == 'Day':
+                hour   = 12
+                minute = 0
+            elif timestep['$'] == 'Night':
+                hour   = 0
+                minute = 0
+            else:
+                hour   = int(timestep['$']) // 60
+                minute = int(timestep['$'])  % 60
+                
+            timesteps.append(datetime.datetime(year, month, day, hour, minute))
+                
+    values = {'Timesteps':timesteps}
+    
+    for param in param_names.keys():
+        values[param] = param_values[param_names[param]]
+        
+    return values
+        
+    
