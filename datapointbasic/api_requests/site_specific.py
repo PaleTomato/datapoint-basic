@@ -25,24 +25,111 @@ class SiteSpecificRequest(GenericRequest):
         return self.site_id
     
     @property
-    def days(self):
+    def _days(self):
         
         if not self._retreived_data:
-            self._get_days()
+            self._get_data()
             self._retreived_data = True
         
-        return self._days
-        
+        return self._days_values
     
-    def _get_days(self):
+    @property
+    def _params(self):
+
+        if not self._retreived_data:
+            self._get_data()
+            self._retreived_data = True
+        
+        return self._params_values
+    
+
+    def _get_data(self):
         
         raw_data = self.retrieve_data()
         
-        params = raw_data['SiteRep']['Wx']['Param']
-        days   = raw_data['SiteRep']['DV']['Location']['Period']
+        self._params_values = raw_data['SiteRep']['Wx']['Param']
+        self._days_values   = raw_data['SiteRep']['DV']['Location']['Period']
         
-        self._days = [Day(params, day) for day in days]
+        #self._days = [Day(params, day) for day in days]
+
+    def get_parameters(self):
+        """
+        Return a list of values that can be retreived.
+        """
+
+        return [param['$'] for param in self._params]
+
+
+    def get_units(self, parameter):
+        """
+        returns the units for the specified parameter.
+        """
         
+        for param in self._params:
+            if param['$'] == parameter:
+                break
+        else:
+            raise ValueError("'{}' is not a recognised parameter for {}".format(
+                parameter, str(self)))
+        
+        return param['units']
+
+
+    def get_values(self, parameter):
+        """
+        Returns the values for a specified parameter.
+        """
+
+        for param in self._params:
+            if param['$'] == parameter:
+                break
+        else:
+            raise ValueError("'{}' is not a recognised parameter for {}".format(
+                parameter, str(self)))
+
+        shortname = param['name']
+        values = []
+        for data_day in self._days:
+            for timestep in data_day['Rep']:
+                values.append(timestep[shortname])
+
+        return values
+
+
+    def get_times(self):
+        """
+        Returns a list of datetime objects for the timesteps
+        """
+
+        times = []
+        for data_day in self._days:
+
+            # Get the date
+            date = data_day['value']
+            year  = int(date[:4])
+            month = int(date[5:7])
+            day   = int(date[8:10])
+
+            for timestep in data_day['Rep']:
+
+                hour   = int(timestep['$']) // 60
+                minute = int(timestep['$'])  % 60
+
+                times.append(datetime.datetime(year, month, day, hour, minute))
+        
+        return times
+
+
+    def get_filters(self):
+        """
+        Return a list of filters that can be applied.
+        """
+        pass
+
+
+    
+
+
 
 class Forecast3hourly(SiteSpecificRequest):
     
@@ -51,7 +138,7 @@ class Forecast3hourly(SiteSpecificRequest):
         
         self.params['res'] = '3hourly'
         self.wx = 'wxfcs'
-        
+
         
 class ForecastDaily(SiteSpecificRequest):
     
