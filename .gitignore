@@ -40,6 +40,7 @@ Thumbs.db
 #######################
 *.project
 *.pydevproject
+.vscode/settings.json
 
 # Python files #
 ################
