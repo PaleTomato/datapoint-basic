@@ -4,70 +4,9 @@ within the package_test
 """
 
 import math
-import requests
 
 # Define radius of the Earth
 radius_earth_km = 6371
-
-
-class ApiManager(object):
-    """
-    Class that manages the datapoint API key. All instances of the class share
-    the same state, so that the API key only needs to be entered once, and can
-    be then shared between all objects that use it
-    """
-    
-    _shared_state = {}
-    
-    def __init__(self, api_key=None):
-        """
-        Initalise by setting the __dict__ of the instance to the _shared_state
-        variable. This allows the api key to be shared between all instances of
-        this class.
-        """
-        self.__dict__ = ApiManager._shared_state
-        
-        if not api_key is None:
-            self.api_key = api_key
-            
-            # Check that the API key is valid
-            if not self.api_key_is_valid():
-                raise ValueError(
-                    'Unable to return data from DataPoint.\n' + \
-                    'API key "%s" may be invalid.' % self.api_key)
-            
-        # Raise an exception if the API key has not been entered the first time
-        try:
-            self.api_key
-        except AttributeError:
-            raise ValueError(
-                "API key must be set for the first instance of ApiManager"
-                )
-            
-    
-    def api_key_is_valid(self):
-        """
-        Return True or False depending on whether the API key is valid.
-        """
-        
-        params = {'key':self.api_key,
-                  'res':'3hourly'}
-        
-        url = 'http://datapoint.metoffice.gov.uk/' + \
-            'public/data/val/wxfcs/all/json/capabilities'
-        
-        req = requests.get(url, params)
-        
-        return req.ok
-    
-    
-    def __repr__(self):
-        
-        return "ApiManager('%s')" % (self.api_key)
-    
-    def __str__(self):
-        
-        return self.api_key
 
 
 def get_place_id(connection,site_name):

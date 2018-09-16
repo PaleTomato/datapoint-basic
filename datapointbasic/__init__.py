@@ -1,5 +1,5 @@
-from .tools import ApiManager
-from .site_parser import get_all_sites
+from .api_call import ApiManager
+#from .site_parser import get_all_sites
 
 def enter_api_key(api_key):
     """
