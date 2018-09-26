@@ -1,0 +1,24 @@
+{
+    "Locations": {
+        "Location": [
+            {
+                "elevation": "123.0",
+                "id": "1234",
+                "latitude": "50.0111",
+                "longitude": "-0.1234",
+                "name": "Test Site 1",
+                "region": "ab",
+                "unitaryAuthArea": "Testshire"
+            },
+            {
+                "elevation": "123.0",
+                "id": "1235",
+                "latitude": "51.0111",
+                "longitude": "0.1234",
+                "name": "Test Site 2",
+                "region": "ab",
+                "unitaryAuthArea": "Testshire"
+            }
+        ]
+    }
+}
