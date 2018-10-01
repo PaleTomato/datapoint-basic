@@ -39,8 +39,9 @@ def get_json_from_path(path, query):
     splitpath = path.split('/')
     splitpath = list(filter(None, splitpath))
 
-    resource_path = os.path.join('Resources',splitpath[2], splitpath[3],
-        splitpath[4], query['res'], splitpath[-1] + '.json')
+    resource_path = os.path.join(os.path.dirname(__file__), 'Resources', 
+        splitpath[2], splitpath[3], splitpath[4], query['res'],
+        splitpath[-1] + '.json')
 
     with open(resource_path, 'rb') as file:
         content = file.read()
@@ -50,7 +51,7 @@ def get_json_from_path(path, query):
 def get_free_port():
     s = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)
     s.bind(('localhost', 0))
-    address, port = s.getsockname()
+    _, port = s.getsockname()
     s.close()
     return port
 

@@ -5,7 +5,7 @@ A set of classes related to making API calls to the DataPoint sevice.
 import requests
 import time
 
-BASE_URL = 'http://datapoint.metoffice.gov.uk/public/data'
+BASE_URL = 'http://datapoint.metoffice.gov.uk'
 
 
 class ApiManager(object):
@@ -30,9 +30,11 @@ class ApiManager(object):
             
             # Check that the API key is valid
             if not self.api_key_is_valid():
-                raise ValueError(
-                    'Unable to return data from DataPoint.\n' + \
-                    'API key "%s" may be invalid.' % self.api_key)
+                error_msg = ('Unable to return data from {url}.\n' + \
+                    'API key "{key}" may be invalid.').format(
+                        url=BASE_URL, key=self.api_key)
+
+                raise ValueError(error_msg)
             
         # Raise an exception if the API key has not been entered the first time
         try:
@@ -51,8 +53,18 @@ class ApiManager(object):
         params = {'key':self.api_key,
                   'res':'3hourly'}
         
-        url = 'http://datapoint.metoffice.gov.uk/' + \
-            'public/data/val/wxfcs/all/json/capabilities'
+        url = '/'.join(
+            (
+                BASE_URL,
+                'public',
+                'data',
+                'val',
+                'wxfcs',
+                'all',
+                'json',
+                'capabilities'
+            )
+        )
         
         req = requests.get(url, params)
         
@@ -114,16 +126,20 @@ class DataPointRequest(object):
         Forms the request together and returns the json.
         """
         
-        url = '{}/{}/{}/{}/{}/{}'.format(
-            BASE_URL,
-            self.val,
-            self.wx,
-            self.item,
-            self.datatype,
-            self.feed
+        path = '/'.join(
+            (
+                BASE_URL,
+                'public',
+                'data',
+                self.val,
+                self.wx,
+                self.item,
+                self.datatype,
+                self.feed
+                )
             )
         
-        req = requests.get(url, self.params)
+        req = requests.get(path, self.params)
 
         # Note the time that the request was made.
         self.request_time = time.time()
