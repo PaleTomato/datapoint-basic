@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import json
 import os
 import socket
 from threading import Thread
@@ -9,6 +10,9 @@ import requests
 MOCK_API_KEY = 'abcdefg'
 
 class MockDataPointServer(BaseHTTPRequestHandler):
+    """
+    Mock DataPoint server that returns canned data based on request.
+    """
     def do_GET(self):
 
         parsed_path = parse.urlparse(self.path)
@@ -22,13 +26,47 @@ class MockDataPointServer(BaseHTTPRequestHandler):
             return
 
         
-        # Process an HTTP GET request and return a response with an HTTP 200 status.
+        # Return a response with an HTTP 200 status.
         self.send_response(200)
         self.send_header('Content-type','application/json')
         self.end_headers()
         self.wfile.write(get_json_from_path(path, query_dict))
 
         return
+
+
+class MockDataPointRequest(object):
+    """
+    Class that mocks the DataPointRequest object using canned data.
+    """
+
+    def __init__(self, val, wx, item, feed, params={}):
+        """
+        Initialise the object
+        """
+
+        self.val    = val
+        self.wx     = wx
+        self.item   = item
+        self.feed   = feed
+        self.params = params
+
+    @property
+    def json(self):
+        """
+        Return the json from the request (from the canned data).
+        """
+
+        resource_path = os.path.join(os.path.dirname(__file__), 'Resources', 
+            self.val, self.wx, self.item, self.params['res'],
+            self.feed + '.json')
+
+        with open(resource_path, 'r') as file:
+            content = json.load(file)
+        
+        return content
+
+
 
 def get_json_from_path(path, query):
     """

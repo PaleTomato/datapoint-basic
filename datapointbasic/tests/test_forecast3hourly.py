@@ -4,9 +4,7 @@ import unittest
 from unittest.mock import patch
 
 from datapointbasic.weather_data import forecast3hourly
-
-RESOURCE_PATH = os.path.join(os.path.dirname(__file__), 'Resources',
-            'val', 'wxfcs', 'all', '3hourly', '1234.json')
+from datapointbasic.tests.mock_server import MockDataPointRequest
 
 class Test3Hourly(unittest.TestCase):
 
@@ -15,9 +13,7 @@ class Test3Hourly(unittest.TestCase):
         self.mock_request_patcher = patch(
             'datapointbasic.weather_data.forecast3hourly.DataPointRequest')
         mock_request = self.mock_request_patcher.start()
-        with open(RESOURCE_PATH, 'r') as file:
-            content = file.read()
-        mock_request.return_value.json = json.loads(content)
+        mock_request.side_effect = MockDataPointRequest
     
     @classmethod
     def tearDownClass(self):
@@ -45,6 +41,19 @@ class Test3Hourly(unittest.TestCase):
         ]
         forecast = forecast3hourly.Forecast3Hourly('1234')
         self.assertEqual(forecast.get_params(), expected_params)
+
+    def test_get_filters(self):
+        """
+        Test that the correct filters are outputted.
+        """
+        expected_filters = [
+            "All",
+            "Next 24 Hours",
+            "Today",
+            "Tomorrow"
+        ]
+        forecast = forecast3hourly.Forecast3Hourly('1234')
+        self.assertEqual(forecast.get_filters(), expected_filters)
 
 if __name__ == '__main__':
     unittest.main()
