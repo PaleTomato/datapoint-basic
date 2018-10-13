@@ -1,4 +1,5 @@
 from ..api_call import DataPointRequest
+from .filter import filter_all, filter_today
 
 class Forecast3Hourly(object):
     
@@ -12,6 +13,10 @@ class Forecast3Hourly(object):
             feed=site_id,
             params={'res':'3hourly'}
             )
+
+        self.filters = [
+            filter_all(self.request),
+            filter_today(self.request)]
     
     def get_params(self):
         """
@@ -27,7 +32,7 @@ class Forecast3Hourly(object):
         pass
 
     def get_filters(self):
-        pass
+        return sorted([str(filt) for filt in self.filters])
     
     def get_units(self, param):
         """
