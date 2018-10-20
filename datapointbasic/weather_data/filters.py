@@ -74,4 +74,41 @@ class filter_today(BaseFilter):
         BaseFilter.__init__(self, datapoint_request)
         self.name = "Today"
 
+    def get_all_values(self, param):
+        
+        all_values = BaseFilter.get_all_values(self, param)
+        all_times  = BaseFilter.get_all_times(self)
+
+        data_date_str = self.request.json["SiteRep"]["DV"]["dataDate"]
+        data_date  =  datetime.strptime(data_date_str, "%Y-%m-%dT%H:%M:%SZ")
+
+        today_values = []
+        
+        for (time, value) in zip(all_times, all_values):
+            if time.date() == data_date.date():
+                today_values.append(value)
+                
+        return today_values
+
+    def get_all_times(self):
+
+        all_times  = BaseFilter.get_all_times(self)
+
+        data_date_str = self.request.json["SiteRep"]["DV"]["dataDate"]
+        data_date  =  datetime.strptime(data_date_str, "%Y-%m-%dT%H:%M:%SZ")
+
+        today_times = []
+        
+        for time in all_times:
+            if time.date() == data_date.date():
+                today_times.append(time)
+                
+        return today_times
+
+
+        
+
+
+
+
 # TODO Add filtering functionality        

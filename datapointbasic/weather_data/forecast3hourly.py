@@ -1,5 +1,5 @@
 from ..api_call import DataPointRequest
-from .filter import filter_all, filter_today
+from .filters import filter_all, filter_today
 
 class Forecast3Hourly(object):
     
