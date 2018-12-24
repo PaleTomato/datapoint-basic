@@ -61,19 +61,34 @@ class BaseFilter(object):
         
                 
     
-class filter_all(BaseFilter):
+class FilterAll(BaseFilter):
 
     def __init__(self, datapoint_request):
         BaseFilter.__init__(self, datapoint_request)
         self.name = "All"
     
     
-class filter_today(BaseFilter):
+class FilterToday(BaseFilter):
     
     def __init__(self, datapoint_request):
         BaseFilter.__init__(self, datapoint_request)
         self.name = "Today"
 
+    def get_all_times(self):
+
+        all_times  = BaseFilter.get_all_times(self)
+
+        data_date_str = self.request.json["SiteRep"]["DV"]["dataDate"]
+        data_date  =  datetime.strptime(data_date_str, "%Y-%m-%dT%H:%M:%SZ")
+
+        today_times = []
+        
+        for time in all_times:
+            if time.date() == data_date.date():
+                today_times.append(time)
+                
+        return today_times
+        
     def get_all_values(self, param):
         
         all_values = BaseFilter.get_all_values(self, param)
@@ -90,25 +105,38 @@ class filter_today(BaseFilter):
                 
         return today_values
 
+
+class FilterNext24(BaseFilter):
+
+    def __init__(self, datapoint_request):
+        BaseFilter.__init__(self, datapoint_request)
+        self.name = "Next 24 Hours"
+
     def get_all_times(self):
 
         all_times  = BaseFilter.get_all_times(self)
 
-        data_date_str = self.request.json["SiteRep"]["DV"]["dataDate"]
-        data_date  =  datetime.strptime(data_date_str, "%Y-%m-%dT%H:%M:%SZ")
+        t0  = datetime.now()
+        t24 = t0 + timedelta(hours=24)
 
-        today_times = []
-        
+        out_times = []
         for time in all_times:
-            if time.date() == data_date.date():
-                today_times.append(time)
-                
-        return today_times
+            if time >= t0 and time <= t24:
+                out_times.append(time)
 
+        return out_times
 
+    def get_all_values(self, param):
         
+        all_values = BaseFilter.get_all_values(self, param)
+        all_times  = BaseFilter.get_all_times(self)
 
+        t0  = datetime.now()
+        t24 = t0 + timedelta(hours=24)
 
-
-
-# TODO Add filtering functionality        
+        out_values = []
+        for (time, value) in zip(all_times, all_values):
+            if time >= t0 and time <= t24:
+                out_values.append(value)
+                
+        return out_values

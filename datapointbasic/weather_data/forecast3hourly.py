@@ -1,5 +1,5 @@
 from ..api_call import DataPointRequest
-from .filters import filter_all, filter_today
+from .filters import FilterAll, FilterToday, FilterNext24 
 
 class Forecast3Hourly(object):
     
@@ -15,8 +15,9 @@ class Forecast3Hourly(object):
             )
 
         self.filters = [
-            filter_all(self.request),
-            filter_today(self.request)]
+            FilterAll(self.request),
+            FilterToday(self.request),
+            FilterNext24(self.request)]
     
     def get_params(self):
         """
