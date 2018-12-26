@@ -2,8 +2,8 @@
 A set of classes related to making API calls to the DataPoint sevice.
 """
 
-import requests
 import time
+import requests
 
 BASE_URL = 'http://datapoint.metoffice.gov.uk'
 
@@ -14,9 +14,9 @@ class ApiManager(object):
     share the same state, so that the API key only needs to be entered
     once, and can be then shared between all objects that use it.
     """
-    
+
     _shared_state = {}
-    
+
     def __init__(self, api_key=None):
         """
         Initalise by setting the __dict__ of the instance to the
@@ -24,18 +24,18 @@ class ApiManager(object):
         between all instances of this class.
         """
         self.__dict__ = ApiManager._shared_state
-        
-        if not api_key is None:
+
+        if api_key is not None:
             self.api_key = api_key
-            
+
             # Check that the API key is valid
             if not self.api_key_is_valid():
-                error_msg = ('Unable to return data from {url}.\n' + \
-                    'API key "{key}" may be invalid.').format(
-                        url=BASE_URL, key=self.api_key)
+                error_msg = ('Unable to return data from {url}.\n' +
+                             'API key "{key}" may be invalid.').format(
+                                 url=BASE_URL, key=self.api_key)
 
                 raise ValueError(error_msg)
-            
+
         # Raise an exception if the API key has not been entered the first time
         try:
             self.api_key
@@ -43,16 +43,15 @@ class ApiManager(object):
             raise ValueError(
                 "API key must be set for the first instance of ApiManager"
                 )
-            
-    
+
     def api_key_is_valid(self):
         """
         Return True or False depending on whether the API key is valid.
         """
-        
-        params = {'key':self.api_key,
-                  'res':'3hourly'}
-        
+
+        params = {'key': self.api_key,
+                  'res': '3hourly'}
+
         url = '/'.join(
             (
                 BASE_URL,
@@ -65,18 +64,15 @@ class ApiManager(object):
                 'capabilities'
             )
         )
-        
+
         req = requests.get(url, params)
-        
+
         return req.ok
-    
-    
+
     def __repr__(self):
-        
         return "ApiManager('%s')" % (self.api_key)
-    
+
     def __str__(self):
-        
         return self.api_key
 
 
@@ -89,21 +85,20 @@ class DataPointRequest(object):
         """
         Initialise the object
         """
-        
-        self.val  = val
-        self.wx   = wx
+
+        self.val = val
+        self.wx = wx
         self.item = item
         self.feed = feed
-        
-        self.api_key  = ApiManager()
-        self.url      = BASE_URL
+
+        self.api_key = ApiManager()
+        self.url = BASE_URL
         self.datatype = 'json'
-        self.params   = {'key': str(self.api_key), **params}
-        
+        self.params = {'key': str(self.api_key), **params}
+
         self.request_time = 0
         self.cache_time = 15 * 60
-        
-    
+
     @property
     def json(self):
         """
@@ -119,13 +114,11 @@ class DataPointRequest(object):
 
         return self._json
 
-
-
     def _retrieve_data(self):
         """
         Forms the request together and returns the json.
         """
-        
+
         path = '/'.join(
             (
                 BASE_URL,
@@ -138,10 +131,10 @@ class DataPointRequest(object):
                 self.feed
                 )
             )
-        
+
         req = requests.get(path, self.params)
 
         # Note the time that the request was made.
         self.request_time = time.time()
-        
+
         return req.json()
