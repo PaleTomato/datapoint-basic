@@ -30,6 +30,12 @@ class TestFilters(unittest.TestCase):
         self.assertEqual(filter_today.times, all_values_times[:4])
         self.assertEqual(filter_today["D"], all_values_winddir[:4])
         
+    def test_filter_tomorrow(self):
+        filter_tomorrow = filters.FilterTomorrow(request_3hourly)
+
+        self.assertEqual(filter_tomorrow.times, all_values_times[4:12])
+        self.assertEqual(filter_tomorrow["D"], all_values_winddir[4:12])
+        
     @patch('datapointbasic.weather_data.filters.datetime')
     def test_filter_next24(self, mock_datetime):
         mock_datetime.now.return_value = datetime(2018, 9, 21, 11, 31)

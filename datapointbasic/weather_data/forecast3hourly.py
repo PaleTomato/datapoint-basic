@@ -3,7 +3,7 @@ Module containing the 3-hourly forecast object.
 """
 
 from ..api_call import DataPointRequest
-from .filters import FilterAll, FilterToday, FilterNext24
+from .filters import FilterAll, FilterToday, FilterNext24, FilterTomorrow
 
 
 class Forecast3Hourly(object):
@@ -24,6 +24,7 @@ class Forecast3Hourly(object):
         self.filters = [
             FilterAll(self.request),
             FilterToday(self.request),
+            FilterTomorrow(self.request),
             FilterNext24(self.request)]
 
     def get_params(self):

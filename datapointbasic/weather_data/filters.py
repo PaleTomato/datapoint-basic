@@ -110,6 +110,47 @@ class FilterToday(BaseFilter):
         return today_values
 
 
+class FilterTomorrow(BaseFilter):
+    """
+    A filter that returns only tomorrow's values.
+    """
+
+    def __init__(self, datapoint_request):
+        BaseFilter.__init__(self, datapoint_request)
+        self.name = "Tomorrow"
+
+    def get_all_times(self):
+
+        all_times = BaseFilter.get_all_times(self)
+
+        data_date_str = self.request.json["SiteRep"]["DV"]["dataDate"]
+        data_date = datetime.strptime(data_date_str, "%Y-%m-%dT%H:%M:%SZ")
+
+        today_times = []
+
+        for time in all_times:
+            if time.date() == data_date.date() + timedelta(days=1):
+                today_times.append(time)
+
+        return today_times
+
+    def get_all_values(self, param):
+
+        all_values = BaseFilter.get_all_values(self, param)
+        all_times = BaseFilter.get_all_times(self)
+
+        data_date_str = self.request.json["SiteRep"]["DV"]["dataDate"]
+        data_date = datetime.strptime(data_date_str, "%Y-%m-%dT%H:%M:%SZ")
+
+        today_values = []
+
+        for (time, value) in zip(all_times, all_values):
+            if time.date() == data_date.date() + timedelta(days=1):
+                today_values.append(value)
+
+        return today_values
+
+
 class FilterNext24(BaseFilter):
     """
     A filter that returns the next 24 hours' data.
