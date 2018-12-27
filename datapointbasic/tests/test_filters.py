@@ -16,7 +16,29 @@ all_values_winddir = ["W", "W", "WSW", "WSW", "WSW", "WSW", "SSW", "SW","SE",
     "NNW", "NNW", "NNE", "NNE", "NNE", "N", "NNE", "NNE", "NE", "NE", "E",
     "SE", "SE", "SE", "ESE"]
 
+MOCK_NOW = datetime(2018, 9, 21, 11, 31)
+
 class TestFilters(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Mock datetime.now() in order to test against static data.
+        """
+        datetime_patch = patch('datapointbasic.weather_data.filters.datetime')
+        cls.mock_datetime = datetime_patch.start()
+        cls.mock_datetime.now.return_value = MOCK_NOW
+        cls.mock_datetime.side_effect = \
+            lambda *args, **kw: datetime(*args, **kw)
+        cls.mock_datetime.strptime.side_effect = \
+            lambda *args, **kw: datetime.strptime(*args, **kw)
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        Stop the mocking of datetime.now()
+        """
+        cls.mock_datetime.stop()
 
     def test_filter_all(self):
         filter_all = filters.FilterAll(request_3hourly)
@@ -36,12 +58,7 @@ class TestFilters(unittest.TestCase):
         self.assertEqual(filter_tomorrow.times, all_values_times[4:12])
         self.assertEqual(filter_tomorrow["D"], all_values_winddir[4:12])
         
-    @patch('datapointbasic.weather_data.filters.datetime')
-    def test_filter_next24(self, mock_datetime):
-        mock_datetime.now.return_value = datetime(2018, 9, 21, 11, 31)
-        mock_datetime.side_effect = lambda *args, **kw: datetime(*args, **kw)
-        mock_datetime.strptime.side_effect = \
-            lambda *args, **kw: datetime.strptime(*args, **kw)
+    def test_filter_next24(self):
         filter_next24 = filters.FilterNext24(request_3hourly)
         
         self.assertEqual(filter_next24.times, all_values_times[:8])
