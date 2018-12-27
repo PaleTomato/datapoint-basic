@@ -25,20 +25,17 @@ class TestFilters(unittest.TestCase):
         """
         Mock datetime.now() in order to test against static data.
         """
-        datetime_patch = patch('datapointbasic.weather_data.filters.datetime')
-        cls.mock_datetime = datetime_patch.start()
-        cls.mock_datetime.now.return_value = MOCK_NOW
-        cls.mock_datetime.side_effect = \
-            lambda *args, **kw: datetime(*args, **kw)
-        cls.mock_datetime.strptime.side_effect = \
-            lambda *args, **kw: datetime.strptime(*args, **kw)
+        cls.datetime_patch = patch(
+            'datapointbasic.weather_data.filters.datetime',
+            new=FakeDatetime)
+        cls.datetime_patch.start()
 
     @classmethod
     def tearDownClass(cls):
         """
         Stop the mocking of datetime.now()
         """
-        cls.mock_datetime.stop()
+        cls.datetime_patch.stop()
 
     def test_filter_all(self):
         filter_all = filters.FilterAll(request_3hourly)
@@ -63,6 +60,22 @@ class TestFilters(unittest.TestCase):
         
         self.assertEqual(filter_next24.times, all_values_times[:8])
         self.assertEqual(filter_next24["D"], all_values_winddir[:8])
+
+
+class FakeDatetime(datetime):
+    """
+    A replacement for datetime that mocks some methods for testing.
+    """
+    def __new__(cls, *args, **kwargs):
+        return datetime.__new__(cls, *args, **kwargs)
+
+    @staticmethod
+    def now(tz=None):
+        """
+        Replace now() method with a specific date for testing.
+        """
+        return MOCK_NOW
+
 
 if __name__ == "__main__":
        unittest.main()
