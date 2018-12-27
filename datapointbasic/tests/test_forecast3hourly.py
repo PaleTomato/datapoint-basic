@@ -1,23 +1,39 @@
+"""
+A set of unit tests for testing forecast3hourly.py
+"""
 import unittest
 from unittest.mock import patch
 
 from datapointbasic.weather_data import forecast3hourly
 from datapointbasic.tests.mock_server import MockDataPointRequest
 
+
 class Test3Hourly(unittest.TestCase):
+    """
+    Test case for testing Forecast3Hourly class
+    """
 
     @classmethod
-    def setUpClass(self):
-        self.mock_request_patcher = patch(
-            'datapointbasic.weather_data.forecast3hourly.DataPointRequest')
-        mock_request = self.mock_request_patcher.start()
-        mock_request.side_effect = MockDataPointRequest
-    
+    def setUpClass(cls):
+        """
+        Set up the tests by patching the DataPointRequest with a mock.
+        """
+        cls.mock_request_patcher = patch(
+            'datapointbasic.weather_data.forecast3hourly.DataPointRequest',
+            new=MockDataPointRequest)
+        cls.mock_request_patcher.start()
+
     @classmethod
-    def tearDownClass(self):
-        self.mock_request_patcher.stop()
+    def tearDownClass(cls):
+        """
+        Stop the patching of DataPointRequest
+        """
+        cls.mock_request_patcher.stop()
 
     def test_json_present(self):
+        """
+        Test that a request object is created that has json.
+        """
         forecast = forecast3hourly.Forecast3Hourly('1234')
         self.assertIsNotNone(forecast.request.json)
 

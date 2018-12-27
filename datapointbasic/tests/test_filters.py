@@ -1,3 +1,6 @@
+"""
+A set of tests for testing filters.py.
+"""
 from datetime import datetime, timedelta
 import unittest
 from unittest.mock import patch
@@ -5,25 +8,30 @@ from unittest.mock import patch
 from datapointbasic.weather_data import filters
 from datapointbasic.tests.mock_server import MockDataPointRequest
 
-request_3hourly = MockDataPointRequest("val", "wxfcs", "all", "1234",
-    {'res':'3hourly'})
+REQUEST_3HOURLY = MockDataPointRequest("val", "wxfcs", "all", "1234",
+                                       {'res': '3hourly'})
 
-all_values_times = [datetime(2018, 9, 21) + timedelta(minutes=delta)
-    for delta in range(720, 7200, 180)]
+ALL_VALUES_TIMES = [datetime(2018, 9, 21) + timedelta(minutes=delta)
+                    for delta in range(720, 7200, 180)]
 
-all_values_winddir = ["W", "W", "WSW", "WSW", "WSW", "WSW", "SSW", "SW","SE",
-    "ESE", "E", "ENE", "ENE", "NE", "NE", "N", "N", "NNW", "NNW", "NNW", "NNW",
-    "NNW", "NNW", "NNE", "NNE", "NNE", "N", "NNE", "NNE", "NE", "NE", "E",
-    "SE", "SE", "SE", "ESE"]
+ALL_VALUES_WINDDIR = ["W", "W", "WSW", "WSW", "WSW", "WSW", "SSW", "SW", "SE",
+                      "ESE", "E", "ENE", "ENE", "NE", "NE", "N", "N", "NNW",
+                      "NNW", "NNW", "NNW", "NNW", "NNW", "NNE", "NNE", "NNE",
+                      "N", "NNE", "NNE", "NE", "NE", "E", "SE", "SE", "SE",
+                      "ESE"]
 
 MOCK_NOW = datetime(2018, 9, 21, 11, 31)
 
+
 class TestFilters(unittest.TestCase):
+    """
+    A class containing the tests for filters.py
+    """
 
     @classmethod
     def setUpClass(cls):
         """
-        Mock datetime.now() in order to test against static data.
+        Patch datetime in order to test against static data.
         """
         cls.datetime_patch = patch(
             'datapointbasic.weather_data.filters.datetime',
@@ -33,33 +41,45 @@ class TestFilters(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """
-        Stop the mocking of datetime.now()
+        Stop the patching of datetime
         """
         cls.datetime_patch.stop()
 
     def test_filter_all(self):
-        filter_all = filters.FilterAll(request_3hourly)
-        
-        self.assertEqual(filter_all.times, all_values_times)
-        self.assertEqual(filter_all["D"], all_values_winddir)
+        """
+        Test the FilterAll class.
+        """
+        filter_all = filters.FilterAll(REQUEST_3HOURLY)
+
+        self.assertEqual(filter_all.times, ALL_VALUES_TIMES)
+        self.assertEqual(filter_all["D"], ALL_VALUES_WINDDIR)
 
     def test_filter_today(self):
-        filter_today = filters.FilterToday(request_3hourly)
+        """
+        Test the FilterToday class.
+        """
+        filter_today = filters.FilterToday(REQUEST_3HOURLY)
 
-        self.assertEqual(filter_today.times, all_values_times[:4])
-        self.assertEqual(filter_today["D"], all_values_winddir[:4])
-        
+        self.assertEqual(filter_today.times, ALL_VALUES_TIMES[:4])
+        self.assertEqual(filter_today["D"], ALL_VALUES_WINDDIR[:4])
+
     def test_filter_tomorrow(self):
-        filter_tomorrow = filters.FilterTomorrow(request_3hourly)
+        """
+        Test the FilterTomorrow class.
+        """
+        filter_tomorrow = filters.FilterTomorrow(REQUEST_3HOURLY)
 
-        self.assertEqual(filter_tomorrow.times, all_values_times[4:12])
-        self.assertEqual(filter_tomorrow["D"], all_values_winddir[4:12])
-        
+        self.assertEqual(filter_tomorrow.times, ALL_VALUES_TIMES[4:12])
+        self.assertEqual(filter_tomorrow["D"], ALL_VALUES_WINDDIR[4:12])
+
     def test_filter_next24(self):
-        filter_next24 = filters.FilterNext24(request_3hourly)
-        
-        self.assertEqual(filter_next24.times, all_values_times[:8])
-        self.assertEqual(filter_next24["D"], all_values_winddir[:8])
+        """
+        Test the FilterNext24 class.
+        """
+        filter_next24 = filters.FilterNext24(REQUEST_3HOURLY)
+
+        self.assertEqual(filter_next24.times, ALL_VALUES_TIMES[:8])
+        self.assertEqual(filter_next24["D"], ALL_VALUES_WINDDIR[:8])
 
 
 class FakeDatetime(datetime):
@@ -78,4 +98,4 @@ class FakeDatetime(datetime):
 
 
 if __name__ == "__main__":
-       unittest.main()
+    unittest.main()
