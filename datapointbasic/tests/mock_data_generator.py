@@ -1,6 +1,7 @@
 """
 Set of classes that can produce a set of mock data for testing purposes.
 """
+from datetime import timedelta
 
 PARAMS_FORECAST_3HOURLY = [
     {'name': 'F', 'units': 'C', '$': 'Feels Like Temperature'},
@@ -76,3 +77,22 @@ class Location(object):
         self.site_id = site_id
         self.site_name = site_name
         self.site_data = kwargs
+
+
+class Forecast3Hourly(object):
+    """
+    A 3-hourly forecast set of data
+    """
+    def __init__(self, time_0, time_n):
+        """
+        Initialise with the times for the forecast.
+
+        Creates the times used for the forecast, starting with time_0
+        and through in 3-hour intervals to time_n.
+        """
+        self.times = []
+        time = time_0
+
+        while time <= time_n:
+            self.times.append(time)
+            time += timedelta(hours=3)
