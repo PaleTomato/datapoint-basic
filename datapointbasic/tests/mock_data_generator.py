@@ -62,11 +62,19 @@ class MockDataGenerator(object):
         self.data_date = data_date
         self.locations = []
 
-    def add_location(self, site_id, site_name, **kwargs):
+    def add_location(self, location):
         """
-        Add a new location to the list of available locations.
+        Add input location to list of available locations.
         """
-        self.locations.append(Location(site_id, site_name, **kwargs))
+        if not isinstance(location, Location):
+            raise TypeError('Input should be a Location object')
+
+        self.locations.append(location)
+
+    def get_json(self, path):
+        """
+        Return the output from the inputted DataPoint-like path.
+        """
 
 
 class Location(object):
@@ -77,6 +85,16 @@ class Location(object):
         self.site_id = site_id
         self.site_name = site_name
         self.site_data = kwargs
+        self.forecast_3hourly = None
+
+    def add_forecast_3hourly(self, forecast_3hourly):
+        """
+        Add a 3-hourly forecast to this location.
+        """
+        if not isinstance(forecast_3hourly, Forecast3Hourly):
+            raise TypeError('Input should be a Forecast3Hourly object')
+
+        self.forecast_3hourly = forecast_3hourly
 
 
 class Forecast3Hourly(object):
@@ -96,3 +114,22 @@ class Forecast3Hourly(object):
         while time <= time_n:
             self.times.append(time)
             time += timedelta(hours=3)
+
+        self.params = {}
+
+    def add_parameter(self, param_id, param_values):
+        """
+        Add a parameter to the forecast
+        """
+        # Check parameter is valid
+        param_ids = [param['name'] for param in PARAMS_FORECAST_3HOURLY]
+        if param_id not in param_ids:
+            raise ValueError('Param {} is not valid'.format(param_id))
+
+        # Check values are the correct length
+        if len(param_values) != len(self.times):
+            raise ValueError(
+                'Length of param_values is {}. It should have length {}'
+                .format(len(param_values), len(self.times)))
+
+        self.params[param_id] = param_values
