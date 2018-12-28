@@ -94,11 +94,14 @@ def get_free_port():
     return port
 
 
-def start_mock_server(port):
+def start_mock_server():
+    port = get_free_port()
+    mock_url = 'http://localhost:{port}'.format(port=port)
     mock_server = HTTPServer(('localhost', port), MockDataPointServer)
-    mock_server_thread = Thread(target=mock_server.serve_forever)
-    mock_server_thread.setDaemon(True)
+    mock_server_thread = Thread(target=mock_server.serve_forever,
+                                daemon=True)
     mock_server_thread.start()
+    return (mock_server, mock_url)
 
 
 if __name__ == '__main__':

@@ -16,20 +16,23 @@ class TestApiCall(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """
-        Set up a mock server for the tests.
+        Set up a mock server for the tests and patch the endpoint.
         """
-        cls.port = mock_server.get_free_port()
-        mock_server.start_mock_server(cls.port)
+        # Set up a mock server
+        (cls.server, mock_url) = mock_server.start_mock_server()
 
-        # Mock the endpoint
-        mock_url = 'http://localhost:{port}'.format(port=cls.port)
-        cls.endpoint_patcher = patch.dict('datapointbasic.api_call.__dict__',
-                                          {'BASE_URL': mock_url})
+        # Patch the endpoint with the mock server endpoint
+        cls.endpoint_patcher = patch('datapointbasic.api_call.BASE_URL',
+                                     new=mock_url)
         cls.endpoint_patcher.start()
 
     @classmethod
     def tearDownClass(cls):
+        """
+        Stop patching the endpoint and shutdown the server.
+        """
         cls.endpoint_patcher.stop()
+        cls.server.shutdown()
 
     def test_valid_api_key(self):
         """
