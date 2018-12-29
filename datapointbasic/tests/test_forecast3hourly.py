@@ -72,11 +72,19 @@ class Test3Hourly(unittest.TestCase):
 
     def test_get_times(self):
         """
-        Test that the get_times method returns a a list of datetimes.
+        Test that the get_times method returns a list of datetimes.
         """
         forecast = forecast3hourly.Forecast3Hourly('1234')
         times = forecast.get_times('All')
         self.assertIsInstance(times[0], datetime)
+
+    def test_get_values(self):
+        """
+        Test that the get_values method returns values.
+        """
+        forecast = forecast3hourly.Forecast3Hourly('1234')
+        values = forecast.get_values('Temperature', 'All')
+        self.assertIsInstance(values, list)
 
 if __name__ == '__main__':
     unittest.main()

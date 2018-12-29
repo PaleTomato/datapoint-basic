@@ -45,7 +45,8 @@ class Forecast3Hourly(object):
         """
         Return a list of values for the specified parameter and filter.
         """
-        pass
+        short_name = self._get_param_shortname(param)
+        return self.filters[time_filter][short_name]
 
     def get_filters(self):
         """
@@ -60,7 +61,21 @@ class Forecast3Hourly(object):
         if param not in self.get_params():
             raise ValueError(
                 'value %s for param is not a valid parameter' % param)
+
         full_params = self.request.json['SiteRep']['Wx']['Param']
         for full_param in full_params:
             if full_param['$'] == param:
                 return full_param['units']
+
+    def _get_param_shortname(self, param):
+        """
+        Get the 'short name' of the parameter 'param'.
+        """
+        if param not in self.get_params():
+            raise ValueError(
+                'value %s for param is not a valid parameter' % param)
+
+        full_params = self.request.json['SiteRep']['Wx']['Param']
+        for full_param in full_params:
+            if full_param['$'] == param:
+                return full_param['name']
