@@ -5,6 +5,8 @@ Module containing the 3-hourly forecast object.
 from ..api_call import DataPointRequest
 from .filters import FilterAll, FilterToday, FilterNext24, FilterTomorrow
 
+VALID_FILTERS = [FilterAll, FilterToday, FilterTomorrow, FilterNext24]
+
 
 class Forecast3Hourly(object):
     """
@@ -21,11 +23,10 @@ class Forecast3Hourly(object):
             params={'res': '3hourly'}
             )
 
-        self.filters = [
-            FilterAll(self.request),
-            FilterToday(self.request),
-            FilterTomorrow(self.request),
-            FilterNext24(self.request)]
+        self.filters = {}
+        for filt in VALID_FILTERS:
+            this_filt = filt(self.request)
+            self.filters[str(this_filt)] = this_filt
 
     def get_params(self):
         """
@@ -38,7 +39,7 @@ class Forecast3Hourly(object):
         """
         Return a list of times for the specified time filter.
         """
-        pass
+        return self.filters[time_filter].times
 
     def get_values(self, param, time_filter):
         """
@@ -50,7 +51,7 @@ class Forecast3Hourly(object):
         """
         Return a list of available time filters.
         """
-        return sorted([str(filt) for filt in self.filters])
+        return sorted(self.filters.keys())
 
     def get_units(self, param):
         """

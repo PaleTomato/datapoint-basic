@@ -1,6 +1,7 @@
 """
 A set of unit tests for testing forecast3hourly.py
 """
+from datetime import datetime
 import unittest
 from unittest.mock import patch
 
@@ -68,6 +69,14 @@ class Test3Hourly(unittest.TestCase):
         ]
         forecast = forecast3hourly.Forecast3Hourly('1234')
         self.assertEqual(forecast.get_filters(), expected_filters)
+
+    def test_get_times(self):
+        """
+        Test that the get_times method returns a a list of datetimes.
+        """
+        forecast = forecast3hourly.Forecast3Hourly('1234')
+        times = forecast.get_times('All')
+        self.assertIsInstance(times[0], datetime)
 
 if __name__ == '__main__':
     unittest.main()
