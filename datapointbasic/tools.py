@@ -4,6 +4,9 @@ within the package_test
 """
 
 import math
+import os
+
+import yaml
 
 # Define radius of the Earth
 RADIUS_EARTH_KM = 6371
@@ -47,3 +50,35 @@ def hav(theta):
     input theta should be in radians
     """
     return (math.sin(theta/2))**2
+
+
+def load_codes():
+    """
+    Return the code lists from the file 'codes.yaml'.
+    """
+    filename_codes = os.path.join(os.path.dirname(__file__),
+                                  'Resources',
+                                  'codes.yaml')
+
+    with open(filename_codes, 'r') as file_codes:
+        return yaml.load(file_codes)
+
+
+def weather_from_code(weather_code):
+    """
+    Convert the inputted weather code to a weather type.
+    """
+    # Convert to integer if not 'NA'
+    if weather_code != 'NA':
+        weather_code = int(weather_code)
+
+    codes = load_codes()
+    return codes['weather_type'][weather_code]
+
+
+def visibility_from_code(visibility_code):
+    """
+    Convert the inputted visibility code to a visibility description.
+    """
+    codes = load_codes()
+    return codes['visibility'][visibility_code]
