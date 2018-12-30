@@ -12,6 +12,9 @@ VALID_FILTERS = [FilterAll, FilterToday, FilterTomorrow, FilterNext24]
 class Forecast3Hourly(object):
     """
     A 3-hourly forecast object. Used to retrieve 3-hourly forecast data.
+
+    Args:
+        site_id (int): the identifier of the site.
     """
     def __init__(self, site_id):
 
@@ -20,7 +23,7 @@ class Forecast3Hourly(object):
             val='val',
             wx='wxfcs',
             item='all',
-            feed=site_id,
+            feed=str(site_id),
             params={'res': '3hourly'}
             )
 
@@ -32,6 +35,10 @@ class Forecast3Hourly(object):
     def get_params(self):
         """
         Return a list of available parameters.
+
+        Returns:
+            list: A list of available weather parameters as strings,
+                sorted alphabetically.
         """
         full_params = self.request.json['SiteRep']['Wx']['Param']
         return sorted([param["$"] for param in full_params])
@@ -83,6 +90,7 @@ class Forecast3Hourly(object):
             values = [visibility_from_code(code) for code in values]
         elif param in ('Temperature', 'Wind Speed', 'Max UV index',
                        'Precipitation Probability'):
+            # Convert string values to integers
             values = [int(value) for value in values]
 
         return values
@@ -90,12 +98,22 @@ class Forecast3Hourly(object):
     def get_filters(self):
         """
         Return a list of available time filters.
+
+        Returns:
+            list: A list of the names of each time filter available.
         """
         return sorted(self.filters.keys())
 
     def get_units(self, param):
         """
         Return the units for the specified parameter.
+
+        Args:
+            param (str): Name of the parameter to use. Use method
+                get_params() to output a list of avaiable parameters.
+
+        Returns:
+            str: A string representation of the units.
         """
         if param not in self.get_params():
             raise ValueError(
@@ -109,6 +127,14 @@ class Forecast3Hourly(object):
     def _get_param_shortname(self, param):
         """
         Get the 'short name' of the parameter 'param'.
+
+        Args:
+            param (str): Name of the parameter to use. Use method
+                get_paramss() to output a list of avaiable parameters.
+
+        Returns:
+            str: The 'short name' of the parameter as used in DataPoint.
+                For example the short name for Temperature is 'T'.
         """
         if param not in self.get_params():
             raise ValueError(

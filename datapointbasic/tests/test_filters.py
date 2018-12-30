@@ -86,7 +86,7 @@ class FakeDatetime(datetime):
     """
     A replacement for datetime that mocks some methods for testing.
     """
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):  # pylint: disable=arguments-differ
         return datetime.__new__(cls, *args, **kwargs)
 
     @staticmethod

@@ -35,7 +35,7 @@ class Test3Hourly(unittest.TestCase):
         """
         Test that a request object is created that has json.
         """
-        forecast = forecast3hourly.Forecast3Hourly('1234')
+        forecast = forecast3hourly.Forecast3Hourly(1234)
         self.assertIsNotNone(forecast.request.json)
 
     def test_get_params(self):
@@ -54,7 +54,7 @@ class Test3Hourly(unittest.TestCase):
             "Wind Gust",
             "Wind Speed",
         ]
-        forecast = forecast3hourly.Forecast3Hourly('1234')
+        forecast = forecast3hourly.Forecast3Hourly(1234)
         self.assertEqual(forecast.get_params(), expected_params)
 
     def test_get_filters(self):
@@ -67,14 +67,14 @@ class Test3Hourly(unittest.TestCase):
             "Today",
             "Tomorrow"
         ]
-        forecast = forecast3hourly.Forecast3Hourly('1234')
+        forecast = forecast3hourly.Forecast3Hourly(1234)
         self.assertEqual(forecast.get_filters(), expected_filters)
 
     def test_get_times(self):
         """
         Test that the get_times method returns a list of datetimes.
         """
-        forecast = forecast3hourly.Forecast3Hourly('1234')
+        forecast = forecast3hourly.Forecast3Hourly(1234)
         times = forecast.get_times('All')
         self.assertIsInstance(times[0], datetime)
 
@@ -82,7 +82,7 @@ class Test3Hourly(unittest.TestCase):
         """
         Test that the get_values method returns values.
         """
-        forecast = forecast3hourly.Forecast3Hourly('1234')
+        forecast = forecast3hourly.Forecast3Hourly(1234)
         values = forecast.get_values('Temperature', 'All')
         self.assertIsInstance(values, list)
 
