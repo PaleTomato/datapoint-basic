@@ -4,6 +4,7 @@ Module containing the 3-hourly forecast object.
 
 from ..api_call import DataPointRequest
 from .filters import FilterAll, FilterToday, FilterNext24, FilterTomorrow
+from ..tools import visibility_from_code, weather_from_code
 
 VALID_FILTERS = [FilterAll, FilterToday, FilterTomorrow, FilterNext24]
 
@@ -35,18 +36,56 @@ class Forecast3Hourly(object):
         full_params = self.request.json['SiteRep']['Wx']['Param']
         return sorted([param["$"] for param in full_params])
 
-    def get_times(self, time_filter):
+    def get_times(self, time_filter, time_format=None):
         """
         Return a list of times for the specified time filter.
+
+        Args:
+            time_filter (str): Name of time filter to use. Use method
+                get_filters() to output a list of available filters.
+            time_format (str, optional): A datetime format code.
+
+        Returns:
+            list: If time_format is not specified, a list of datetime
+                objects. If time_format is specified, then a list of
+                strings in the time_format specified.
         """
-        return self.filters[time_filter].times
+        times = self.filters[time_filter].times
+
+        if time_format:
+            times = [time.strftime(time_format) for time in times]
+
+        return times
 
     def get_values(self, param, time_filter):
         """
         Return a list of values for the specified parameter and filter.
+
+        Args:
+            param (str): Name of the parameter to use. Use method
+                get_paramss() to output a list of avaiable parameters.
+            time_filter (str): Name of time filter to use. Use method
+                get_filters() to output a list of available filters.
+
+        Returns:
+            list: A list of values for the parameter using the specified
+                time filter. The format of the values depends on the
+                parameter specified.
         """
         short_name = self._get_param_shortname(param)
-        return self.filters[time_filter][short_name]
+        values = self.filters[time_filter][short_name]
+
+        if param == 'Weather Type':
+            # Convert weather code to full description
+            values = [weather_from_code(code) for code in values]
+        elif param == 'Visibility':
+            # Convert visibility to full description
+            values = [visibility_from_code(code) for code in values]
+        elif param in ('Temperature', 'Wind Speed', 'Max UV index',
+                       'Precipitation Probability'):
+            values = [int(value) for value in values]
+
+        return values
 
     def get_filters(self):
         """
