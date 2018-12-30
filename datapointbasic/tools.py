@@ -82,3 +82,11 @@ def visibility_from_code(visibility_code):
     """
     codes = load_codes()
     return codes['visibility'][visibility_code]
+
+
+def region_from_code(region_code):
+    """
+    Convert the inputted region code to a region name.
+    """
+    codes = load_codes()
+    return codes['region_names'][region_code]
