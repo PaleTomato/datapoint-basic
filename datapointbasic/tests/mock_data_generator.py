@@ -2,6 +2,7 @@
 Set of classes that can produce a set of mock data for testing purposes.
 """
 from datetime import timedelta
+import json
 
 PARAMS_FORECAST_3HOURLY = [
     {'name': 'F', 'units': 'C', '$': 'Feels Like Temperature'},
@@ -75,6 +76,21 @@ class MockDataGenerator(object):
         """
         Return the output from the inputted DataPoint-like path.
         """
+
+    def _json_sitelist(self):
+        """
+        Return the json sitelist output for the specified forecast_type.
+        """
+        output = {'Locations': {'Location': []}}
+
+        for location in self.locations:
+
+            site_data = location.site_data
+            site_data['id'] = location.site_id
+            site_data['name'] = location.site_name
+            output['Locations']['Location'].append(site_data)
+
+        return json.dumps(output, sort_keys=True, indent=4)
 
 
 class Location(object):
