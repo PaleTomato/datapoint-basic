@@ -36,20 +36,23 @@ class Location(ABC):
 
 class Site(Location):
 
-    def __init__(self, name, site_id, latitude=None, longitude=None,
-                 elevation=None):
+    def __init__(self, name, identifier, latitude, longitude, elevation):
 
         super().__init__(self, name)
-        self.site_id = site_id
+        self.identifier = identifier
         self.latitude = latitude
         self.longitude = longitude
         self.elevation = elevation
+
+        self.forecast_3hourly = None
+        self.forecast_daily = None
+        self.observations_hourly = None
 
     def __repr__(self):
         return "{}('{}:{}')".format(
             type(self).__name__,
             self.name,
-            self.site_id)
+            self.identifier)
 
 
 class Area(Location):
